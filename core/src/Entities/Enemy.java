@@ -166,4 +166,5 @@ public class Enemy extends Entity{
     public void setDamaged(boolean damaged) {
         isDamaged = damaged;
     }
+
 }

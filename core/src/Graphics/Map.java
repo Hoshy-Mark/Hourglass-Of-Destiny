@@ -144,12 +144,18 @@ public class Map {
                         else if(green == 255 && red==0){
                             //parte de cima do portal (pixel azul claro)
                             setCellAndTile(x, y,"Grass2",new Tiles(x, y, 16, 16,  sprite, "floor"),Sprites);
-
+                            int[] xy = new int[2];
+                            xy[0] = x;
+                            xy[1] = y;
+                            positions.put("PortalDown", xy);
                         }
                         else if(green == 132 && red== 0){
                             //parte de baixo do portal (pixel azul escuro)
                             setCellAndTile(x, y,"Grass2",new Tiles(x, y, 16, 16, sprite, "floor"),Sprites);
-
+                            int[] xy = new int[2];
+                            xy[0] = x;
+                            xy[1] = y;
+                            positions.put("PortalUp", xy);
                         }
                         break;
                 }

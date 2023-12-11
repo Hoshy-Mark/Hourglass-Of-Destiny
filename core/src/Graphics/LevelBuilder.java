@@ -29,6 +29,13 @@ public class LevelBuilder {
         return new Crossbow(x, y, 16, 16, loader.getSprites("CrossbowAnimation"));
     }
 
+    public Portal createPortalUp(int x, int y){
+        return new Portal(x,y,16,16, loader.getSprites("PortalUp"));
+    }
+    public Portal createPortalDown(int x, int y){
+        return new Portal(x,y,16,16, loader.getSprites("PortalDown"));
+    }
+
     public ArrayList<Enemy> createEnemies(ArrayList<Point> enemyPositions, Player player) {
         ArrayList<Enemy> enemies = new ArrayList<Enemy>();
         for(Point point : enemyPositions) {

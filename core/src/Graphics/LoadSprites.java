@@ -30,7 +30,8 @@ public class LoadSprites {
         loadSpriteSheet("Orange Cape","Sprites/Orange Cape-sheet.png", 16, 16);
         loadSpriteSheet("Pink Armor","Sprites/Pink Armor-sheet.png", 16, 16);
         loadSpriteSheet("Pink Cape","Sprites/Pink Cape-sheet.png", 16, 16);
-        loadSpriteSheet("Portal","Sprites/Portal-sheet.png", 16, 16);
+        loadSpriteSheet("PortalUp","Sprites/PortalUp-sheet.png", 16, 16);
+        loadSpriteSheet("PortalDown","Sprites/PortalDown-sheet.png", 16, 16);
         loadSpriteSheet("Slime","Sprites/Slime-sheet.png", 16, 16);
         loadSpriteSheet("Player","Sprites/Player-sheet.png", 16, 16);
         loadSpriteSheet("Yellow Armor","Sprites/Yellow Armor-sheet.png", 16, 16);

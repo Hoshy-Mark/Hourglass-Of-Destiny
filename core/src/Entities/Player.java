@@ -195,7 +195,9 @@ public class Player extends Entity {
         }
     public boolean isAccessible(float x, float y, Map map) {
         return map.getTileAt((int) (x / tileSize), (int) (y / tileSize)).isAccessible() &&
-                map.getTileAt((int) (x / tileSize), (int) ((y + getHeight()) / tileSize)).isAccessible();
+                map.getTileAt((int) (x / tileSize), (int) ((y + getHeight()) / tileSize)).isAccessible() &&
+                map.getTileAt((int) ((x + getWidth()) / tileSize), (int) (y / tileSize)).isAccessible() &&
+                map.getTileAt((int) ((x + getWidth()) / tileSize), (int) ((y + getHeight()) / tileSize)).isAccessible();
     }
     public void draw(Batch batch){
         SpriteCurrent.draw(batch);
