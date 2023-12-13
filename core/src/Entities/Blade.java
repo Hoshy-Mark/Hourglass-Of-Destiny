@@ -14,6 +14,7 @@ public class Blade extends Entity {
 
     private final float animationDuration = 0.15f;
     private float stateTime = 0.0f;
+    private String direction;
 
     public Blade(float x, float y, float width, float height, Array<TextureRegion> blades) {
         super(x, y, width, height);
@@ -36,6 +37,8 @@ public class Blade extends Entity {
         else if("left".equals(direction)){
             animationCurrent = new Animation<TextureRegion>(animationDuration, LeftBlade, Animation.PlayMode.LOOP);
         }
+
+        this.direction = direction;
     }
 
     public void draw(Batch batch){
@@ -49,5 +52,9 @@ public class Blade extends Entity {
         //Aqui você pode adicionar a lógica da espada.
 
         //Exemplo: se o jogador pressionou a tecla de atacar, inicie a animação e verifique se é necessário atacar algum inimigos etc.
+    }
+
+    public String getDirection() {
+        return direction;
     }
 }
