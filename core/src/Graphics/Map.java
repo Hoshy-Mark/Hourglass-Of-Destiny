@@ -111,6 +111,10 @@ public class Map {
                             setCellAndTile(x, y,"Grass1",new Tiles(x, y, 16, 16, sprite, "floor"),Sprites);
 
                         }
+                        else if(green == 100 && red == 100){
+                            //espada (pixel verde musgo)
+                            setCellAndTile(x, y, "Grass2", new Tiles(x, y, 16, 16, sprite, "floor"), Sprites);
+                        }
 
                         // outros casos com blue == 0
                         break;

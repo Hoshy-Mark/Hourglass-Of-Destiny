@@ -7,11 +7,14 @@ import com.badlogic.gdx.utils.Array;
 
 public class Gun extends Entity{
 
+    // Declaramos Sprites para cada direção que a arma pode mirar e declarando o Sprite que será considerado o atual
     private Sprite RightSprite;
     private Sprite LeftSprite;
     private Sprite UpSprite;
     private Sprite DownSprite;
     private Sprite SpriteCurrent;
+
+
     public Gun(float x, float y, float width, float height, Array<TextureRegion> sprites) {
         super(x, y, width, height);
 

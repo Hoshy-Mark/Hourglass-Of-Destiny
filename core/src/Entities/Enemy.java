@@ -13,47 +13,49 @@ public class Enemy extends Entity{
     private Animation<TextureRegion> animationLeft;
     private Animation<TextureRegion> currentAnimation;
     private Sprite SpriteCurrent;
-    private float animationDuration = 0.3f;
+    private float animationDuration = 0.3f; // duração da animação em segundos
+    private float animationTimer = 0; // temporizador para auxiliar na transição de sprites de animação
+    private float speed = 20; // velocidade do movimento inimigo
+    private boolean isDamaged = false; // indica se o inimigo está atualmente sofrendo dano
+    private int life = 15; // vida ou saúde do inimigo
+    private int damage = 1; // quantidade de dano que o inimigo causa ao jogador
+    float stateTime = 0; // temporizador geral do estado que é usado para várias tarefas
+    private float damagedDuration = 0.2f; // duração da animação de dano em segundos
+    float maxViewDistance = 50f; // A distância máxima em que o inimigo pode ver o jogador e atacar
 
-    private float animationTimer = 0;
-    private float speed = 20;
-    private boolean isDamaged = false;
-    private int life = 15;
-    private int damage = 1;
-    float stateTime = 0;
-    private float damagedDuration = 0.2f;
-
-    public void setMaxViewDistance(float maxViewDistance) {
-        this.maxViewDistance = maxViewDistance;
-    }
-
-    float maxViewDistance = 50f;  // Distância máxima para o inimigo ver o jogador
 
     public Enemy(float x, float y, float width, float height, Array<TextureRegion> sprites, Player player) {
-        super(x, y, width, height);
-        this.sprites = sprites;
-        this.player = player;
+        super(x, y, width, height); // chamada ao construtor da superclasse (Entity)
+        this.sprites = sprites; // atribui as sprites de animação fornecidas ao inimigo
+        this.player = player; // referência ao objeto do jogador para interação
 
-        // Inicialização dos Arrays antes de usar
+        // Criação de arrays de sprites para diferentes direções e estados do inimigo
         RightSprites = new Array<TextureRegion>();
         LeftSprites = new Array<TextureRegion>();
 
-        for(int i = 0; i<4;i++){
+        // Armazena as sprites individuais para animações direita e esquerda nas respectivas listas
+        for(int i = 0; i<4; i++){
             RightSprites.add(sprites.get(i));
             LeftSprites.add(sprites.get(i+5));
         }
 
+        // Define a sprite atual como a primeira sprite de direita
         SpriteCurrent = new Sprite(RightSprites.get(0));
 
+        // Define array de sprites para o estado de dano
         DamageSprites = new Array<TextureRegion>();
         DamageSprites.add(sprites.get(4));
         DamageSprites.add(sprites.get(9));
 
+        // Cria animações para movimentos para a direita e para a esquerda usando as listas de sprites
         animationRight = new Animation<TextureRegion>(animationDuration, RightSprites);
         animationLeft = new Animation<TextureRegion>(animationDuration, LeftSprites);
 
+        // Define a animação atual logo no inicio do objeto
         currentAnimation = animationRight;
     }
+
+    // Este método é chamado em cada quadro de animação para realizar ações do inimigo
     @Override
     public void act(float delta) {
 
@@ -167,4 +169,7 @@ public class Enemy extends Entity{
         isDamaged = damaged;
     }
 
+    public void setMaxViewDistance(float maxViewDistance) {
+        this.maxViewDistance = maxViewDistance;
+    }
 }

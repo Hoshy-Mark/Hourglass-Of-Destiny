@@ -4,6 +4,7 @@ import Entities.*;
 import Entities.Items.Arrow;
 import Entities.Items.Crossbow;
 import Entities.Items.MedicalKit;
+import Entities.Items.Sword;
 import Graphics.LevelBuilder;
 import Graphics.LoadSprites;
 import Graphics.Map;

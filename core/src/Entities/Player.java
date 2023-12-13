@@ -1,5 +1,6 @@
 package Entities;
 
+import Entities.Blades.Sword;
 import Graphics.LoadSprites;
 import Graphics.Map;
 import com.badlogic.gdx.Gdx;
@@ -37,6 +38,8 @@ public class Player extends Entity {
     private Sprite previousSprite;
     private Crossbow crossbowGun;
     private Entities.Items.Crossbow crossbowItem;
+    private Entities.Items.Sword swordItem;
+
     private String ammunitionString;
     private float damagedDuration = 0.3f;
     private boolean playerDamaged = false;
@@ -46,6 +49,8 @@ public class Player extends Entity {
     private LoadSprites loader;
     private float shootElapsedTime = 0;
     private Crossbow crossbowGun1;
+
+    private Sword sword;
 
 
     public Player(float x, float y, float width, float height, Array<TextureRegion> sprites,  LoadSprites loader) {
@@ -105,11 +110,19 @@ public class Player extends Entity {
                 if (crossbowGun != null) {
                     crossbowGun.setOrientation("left");
                 }
+                if (sword != null) {
+                    sword.setPosition(this.getX(), this.getY());
+                    sword.setOrientation("left");
+                }
                 moving = true;
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
                 this.move("right", delta, map);
                 if (crossbowGun != null) {
                     crossbowGun.setOrientation("right");
+                }
+                if (sword != null) {
+                    sword.setPosition(this.getX(), this.getY());
+                    sword.setOrientation("right");
                 }
                 moving = true;
             }
@@ -140,6 +153,10 @@ public class Player extends Entity {
             if (crossbowItem != null && Entity.isColliding(this, crossbowItem)) {
                 crossbowGun1 = new Entities.Guns.Crossbow(getX(), getY(), 16, 16, loader.getSprites("CrossbowGun"), loader);
                 crossbowItem = null;
+            }
+            if (swordItem != null && Entity.isColliding(this, swordItem)) {
+                sword = new Entities.Blades.Sword(this.getX(),this.getY(), 16, 16, loader.getSprites("Sword"));
+                swordItem = null;
             }
 
             // Reseta o sprite para o sprite anterior se o tempo
@@ -203,6 +220,9 @@ public class Player extends Entity {
         SpriteCurrent.draw(batch);
         if(crossbowGun != null) {
             crossbowGun.draw(batch);
+        }
+        if(sword != null) {
+            sword.draw(batch);
         }
     }
 
