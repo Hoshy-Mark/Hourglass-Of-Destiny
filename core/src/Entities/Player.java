@@ -161,6 +161,15 @@ public class Player extends Entity {
             } else {
                 speed = 60;
             }
+            if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                if (sword != null && !sword.isAttacking()) { // certifique-se de que a espada está disponível e não está atualmente atacando antes de atacar
+                    sword.setOrientation(currentAnimation == animationRight ? "right" : "left");
+                    sword.attack();
+                }
+            }
+            if(sword != null){
+                sword.act(delta);
+            }
             if (crossbow != null && Entity.isColliding(this, crossbow)) {
                 this.crossbowGun = crossbow;
                 crossbow = null;
