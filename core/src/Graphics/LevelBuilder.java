@@ -6,6 +6,7 @@ import Entities.Enemies.Slime;
 import Entities.Items.Arrow;
 import Entities.Items.Crossbow;
 import Entities.Items.MedicalKit;
+import Entities.Items.Sword;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
@@ -27,6 +28,10 @@ public class LevelBuilder {
     }
     public Crossbow createCrossbow(int x, int y){
         return new Crossbow(x, y, 16, 16, loader.getSprites("CrossbowAnimation"));
+    }
+
+    public Sword createSword(int x, int y){
+        return new Sword(x, y, 16, 16, new TextureRegion(loader.getSprite("Sword")));
     }
 
     public Portal createPortalUp(int x, int y){

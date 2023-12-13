@@ -11,6 +11,6 @@ public class Bat extends Enemy {
         setLife(10);
         setDamage(2);
         setSpeed(50);
-        setMaxViewDistance(50);
+        setMaxViewDistance(20);
     }
 }

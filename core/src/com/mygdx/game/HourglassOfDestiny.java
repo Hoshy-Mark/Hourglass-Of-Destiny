@@ -41,7 +41,8 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	private int currentNivel;
 	private Portal portalUp;
 	private Portal portalDown;
-
+	private Sword swordItem;
+	private Entities.Blades.Sword sword;
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -60,6 +61,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		arrows = levelBuilder.createArrows(map.getArrowsListed());
 		crossbowItem = levelBuilder.createCrossbow(map.getPosition("Crossbow")[0]*16, map.getPosition("Crossbow")[1]*16);
 		crossbowGun = null;
+		swordItem = levelBuilder.createSword(map.getPosition("Sword")[0]*16,map.getPosition("Sword")[1]*16);
 		bullets = new ArrayList<Bullet>();
 		portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0]*16, map.getPosition("PortalUp")[1]*16);
 		portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0]*16, map.getPosition("PortalDown")[1]*16);
@@ -72,7 +74,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // Limpar a tela
 		float delta = Gdx.graphics.getDeltaTime();  // Obtem o tempo entre frames
 
-		player.act(delta, map, enemies, crossbowGun);
+		player.act(delta, map, enemies, crossbowGun, swordItem);
 
 		if (enemies.isEmpty() && Entity.isColliding(player, portalUp)) {
 			currentNivel++;
@@ -109,6 +111,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		if(crossbowItem != null) {
 			crossbowItem.update(delta);
 		}
+
 		camera.zoom = 0.2f; // 2 vezes mais zoom do que o normal
 		camera.update();
 
@@ -142,6 +145,14 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		if(crossbowGun != null) {
 			crossbowGun.setPosition(player.getX()+4,player.getY()-3);
 			crossbowGun.draw(batch);
+		}
+		if(swordItem != null && Entity.isColliding(player, swordItem) && sword == null) {
+			sword = new Entities.Blades.Sword(player.getX(),player.getY(), 16, 16, loader.getSprites("Sword"));
+			swordItem = null;
+		}
+
+		if(player.getSword() == null && swordItem != null && sword == null) {
+			swordItem.draw(batch);
 		}
 
 		for (Bullet bullet : bullets) {

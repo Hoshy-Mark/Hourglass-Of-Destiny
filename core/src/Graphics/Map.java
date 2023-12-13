@@ -114,6 +114,10 @@ public class Map {
                         else if(green == 100 && red == 100){
                             //espada (pixel verde musgo)
                             setCellAndTile(x, y, "Grass2", new Tiles(x, y, 16, 16, sprite, "floor"), Sprites);
+                            int[] xy = new int[2];
+                            xy[0] = x;
+                            xy[1] = y;
+                            positions.put("Sword", xy);
                         }
 
                         // outros casos com blue == 0

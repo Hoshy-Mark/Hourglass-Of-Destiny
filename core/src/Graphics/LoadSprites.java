@@ -35,6 +35,8 @@ public class LoadSprites {
         loadSpriteSheet("Slime","Sprites/Slime-sheet.png", 16, 16);
         loadSpriteSheet("Player","Sprites/Player-sheet.png", 16, 16);
         loadSpriteSheet("Yellow Armor","Sprites/Yellow Armor-sheet.png", 16, 16);
+        loadSpriteSheet("Sword", "Sprites/Sword-sheet.png",16,16);
+        loadSpriteSheet("Sword Power Up", "Sprites/Sword PowerUp-sheet.png",16,16);
         loadAllSprites();
     }
 
@@ -53,6 +55,7 @@ public class LoadSprites {
         loadSprite("RedRing", "Sprites/Red Ring.png");
         loadSprite("GreenRing", "Sprites/Green Ring.png");
         loadSprite("Arrow", "Sprites/Arrow.png");
+        loadSprite("Sword", "Sprites/Sword.png");
     }
     public void loadSpriteSheet(String keyName, String filePath, int spriteWidth, int spriteHeight) {
         Texture spritesheet = new Texture(Gdx.files.internal(filePath));
