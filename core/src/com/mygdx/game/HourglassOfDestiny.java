@@ -112,6 +112,22 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 			crossbowItem.update(delta);
 		}
 
+		Iterator<Enemy> enemyIterator = enemies.iterator(); // Criação de um iterator para iterar sobre os inimigos
+		while (enemyIterator.hasNext()) {
+			Enemy enemy = enemyIterator.next();
+			enemy.act(delta);
+			if(player.getSword() != null) {
+				Blade blade = player.getSword();
+				if(blade.isAttacking() && Entity.isColliding(blade, enemy)) {
+					enemy.setLife(enemy.getLife() - blade.getDamage());
+					enemy.setDamaged(true);
+				}
+				// Verifica se a vida do inimigo é menor ou igual a zero
+				if (enemy.getLife() <= 0) {
+					enemyIterator.remove(); // Se sim, remove o inimigo
+				}
+			}
+		}
 		camera.zoom = 0.2f; // 2 vezes mais zoom do que o normal
 		camera.update();
 

@@ -10,7 +10,7 @@ public class Bat extends Enemy {
         super(x, y, width, height, sprites, player);
         setLife(10);
         setDamage(2);
-        setSpeed(50);
-        setMaxViewDistance(20);
+        setSpeed(10);
+        setMaxViewDistance(50);
     }
 }

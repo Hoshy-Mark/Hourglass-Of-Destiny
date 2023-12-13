@@ -15,19 +15,21 @@ public class Enemy extends Entity{
     private Sprite SpriteCurrent;
     private float animationDuration = 0.3f; // duração da animação em segundos
     private float animationTimer = 0; // temporizador para auxiliar na transição de sprites de animação
-    private float speed = 20; // velocidade do movimento inimigo
+    private float speed = 10; // velocidade do movimento inimigo
     private boolean isDamaged = false; // indica se o inimigo está atualmente sofrendo dano
     private int life = 15; // vida ou saúde do inimigo
     private int damage = 1; // quantidade de dano que o inimigo causa ao jogador
     float stateTime = 0; // temporizador geral do estado que é usado para várias tarefas
     private float damagedDuration = 0.2f; // duração da animação de dano em segundos
     float maxViewDistance = 50f; // A distância máxima em que o inimigo pode ver o jogador e atacar
-
+    private float originalSpeed;
+    private String direction;
 
     public Enemy(float x, float y, float width, float height, Array<TextureRegion> sprites, Player player) {
         super(x, y, width, height); // chamada ao construtor da superclasse (Entity)
         this.sprites = sprites; // atribui as sprites de animação fornecidas ao inimigo
         this.player = player; // referência ao objeto do jogador para interação
+        originalSpeed = this.speed;
 
         // Criação de arrays de sprites para diferentes direções e estados do inimigo
         RightSprites = new Array<TextureRegion>();
@@ -83,7 +85,7 @@ public class Enemy extends Entity{
         if (player.getEnemyStopTime() > 0) {
             player.setEnemyStopTime(player.getEnemyStopTime()-delta);
         } else if (getSpeed() == 0) {
-            setSpeed(40);
+            setSpeed(originalSpeed);
         }
 
         float distX = Math.abs(player.getX() - getX());
@@ -93,14 +95,18 @@ public class Enemy extends Entity{
         if (distance < maxViewDistance) {
             if (player.getX() < getX() && !isCollidingWithPlayer()) {
                 moveLeft(delta);
+                direction = "left";
             } else if (player.getX() > getX() && !isCollidingWithPlayer()) {
                 moveRight(delta);
+                direction = "right";
             }
 
             if(player.getY() < getY() && !isCollidingWithPlayer()){
                 setPosition(getX(), getY() - speed * delta);
+                direction = "up";
             } else if(player.getY() > getY() && !isCollidingWithPlayer()) {
                 setPosition(getX(), getY() + speed * delta);
+                direction = "down";
             }
         }
         SpriteCurrent.setPosition(getX(), getY());
@@ -171,5 +177,8 @@ public class Enemy extends Entity{
 
     public void setMaxViewDistance(float maxViewDistance) {
         this.maxViewDistance = maxViewDistance;
+    }
+    public String getDirection() {
+        return direction;
     }
 }

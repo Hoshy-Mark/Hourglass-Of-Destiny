@@ -49,9 +49,8 @@ public class Player extends Entity {
     private LoadSprites loader;
     private float shootElapsedTime = 0;
     private Crossbow crossbowGun1;
-
+    private String direction;
     private Sword sword;
-
 
     public Player(float x, float y, float width, float height, Array<TextureRegion> sprites,  LoadSprites loader) {
         super(x, y, width, height);
@@ -106,53 +105,59 @@ public class Player extends Entity {
         else {
 
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
-                this.move("left", delta, map);
-                if (crossbowGun != null) {
-                    crossbowGun.setOrientation("left");
+                if (!isCollidingWithEnemy(enemies)) {
+                    this.move("left", delta, map);
+                    if (crossbowGun != null) {
+                        crossbowGun.setOrientation("left");
+                    }
+                    if (sword != null) {
+                        sword.setPosition(this.getX() - 2, this.getY() + 3);
+                        sword.setOrientation("left");
+                    }
+                    moving = true;
                 }
-                if (sword != null) {
-                    sword.setPosition(this.getX()-2, this.getY()+3);
-                    sword.setOrientation("left");
-                }
-                moving = true;
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
-                this.move("right", delta, map);
-                if (crossbowGun != null) {
-                    crossbowGun.setOrientation("right");
+                if (!isCollidingWithEnemy(enemies)) {
+                    this.move("right", delta, map);
+                    if (crossbowGun != null) {
+                        crossbowGun.setOrientation("right");
+                    }
+                    if (sword != null) {
+                        sword.setPosition(this.getX() + 2, this.getY() + 3);
+                        sword.setOrientation("right");
+                    }
+                    moving = true;
                 }
-                if (sword != null) {
-                    sword.setPosition(this.getX()+2, this.getY()+3);
-                    sword.setOrientation("right");
-                }
-                moving = true;
             }
 
             if (Gdx.input.isKeyPressed(Input.Keys.UP )|| Gdx.input.isKeyPressed(Input.Keys.W)) {
-                this.move("up", delta, map);
-                moving = true;
-                if (crossbowGun != null) {
-                    crossbowGun.setOrientation("up");
-                }
-                if (sword != null) {
-                    if(sword.getDirection().equals("left")){
-                        sword.setPosition(this.getX()-2, this.getY()+3);
+                if (!isCollidingWithEnemy(enemies)) {
+                    this.move("up", delta, map);
+                    moving = true;
+                    if (crossbowGun != null) {
+                        crossbowGun.setOrientation("up");
                     }
-                    else{
-                        sword.setPosition(this.getX()+2, this.getY()+3);
+                    if (sword != null) {
+                        if (sword.getDirection().equals("left")) {
+                            sword.setPosition(this.getX() - 2, this.getY() + 3);
+                        } else {
+                            sword.setPosition(this.getX() + 2, this.getY() + 3);
+                        }
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)|| Gdx.input.isKeyPressed(Input.Keys.S))  {
-                this.move("down", delta, map);
-                moving = true;
-                if (crossbowGun != null) {
-                    crossbowGun.setOrientation("down");
-                }
-                if (sword != null) {
-                    if(sword.getDirection().equals("left")){
-                        sword.setPosition(this.getX()-2, this.getY()+3);
+                if (!isCollidingWithEnemy(enemies)) {
+                    this.move("down", delta, map);
+                    moving = true;
+                    if (crossbowGun != null) {
+                        crossbowGun.setOrientation("down");
                     }
-                    else{
-                        sword.setPosition(this.getX()+2, this.getY()+3);
+                    if (sword != null) {
+                        if (sword.getDirection().equals("left")) {
+                            sword.setPosition(this.getX() - 2, this.getY() + 3);
+                        } else {
+                            sword.setPosition(this.getX() + 2, this.getY() + 3);
+                        }
                     }
                 }
             }
@@ -180,7 +185,6 @@ public class Player extends Entity {
                 crossbowItem = null;
             }
             if (swordItem != null && Entity.isColliding(this, swordItem)) {
-                System.out.println("Colidindo com sword");
                 sword = new Entities.Blades.Sword(this.getX(),this.getY(), 16, 16, loader.getSprites("Sword"));
                 swordItem = null;
             }
@@ -262,12 +266,29 @@ public class Player extends Entity {
 
                 if (life > 0) { // Se o jogador ainda tem vida
                     playerDamaged = true;
-                    setPosition(getX() - 1, getY() - 1); // Move o jogador para trás (ajuste os -10 para conseguir o efeito desejado)
+                    if(sword!=null) {
+                        sword.setPosition(getX(), getY());  // atualizar posição da espada
+                    }
                     enemy.setSpeed(0.0f); // Para o inimigo
-                    enemyStopTime = 1f; // Define o tempo que o inimigo ficará parado
+                    enemyStopTime = 30f; // Define o tempo que o inimigo ficará parado
 
                     // Guarda o sprite anterior e muda para o sprite de dano
                     previousSprite = SpriteCurrent;
+
+                    String enemyDirection = enemy.getDirection();
+                    if(enemyDirection.equals("up")) {
+                        this.setY(this.getY() - 2);// empurra o jogador para baixo
+                        setPosition(this.getX(), this.getY());
+                    } else if(enemyDirection.equals("down")) {
+                        this.setY(this.getY() + 2); // empurra o jogador para cima
+                        setPosition(this.getX(), this.getY());
+                    } else if(enemyDirection.equals("left")) {
+                        this.setX(this.getX() - 2); // empurra o jogador para direita
+                        setPosition(this.getX(), this.getY());
+                    } else if(enemyDirection.equals("right")) {
+                        this.setX(this.getX() + 2); // empurra o jogador para esquerda
+                        setPosition(this.getX(), this.getY());
+                    }
                     if(currentAnimation == animationRight) {
                         SpriteCurrent = new Sprite(DamageSprites.get(0));
                     } else {
@@ -342,5 +363,20 @@ public class Player extends Entity {
 
     public Sword getSword() {
         return sword;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+    public boolean isCollidingWithEnemy(ArrayList<Enemy> enemies) {
+        for (Enemy enemy : enemies) {
+            if (isColliding(this, enemy))
+                return true;
+        }
+        return false;
     }
 }

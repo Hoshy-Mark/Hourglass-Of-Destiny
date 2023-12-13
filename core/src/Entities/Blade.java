@@ -18,6 +18,8 @@ public class Blade extends Entity {
     private String direction;
     private boolean isAttacking;
     private boolean isIdle;
+    private int damage = 1;
+
 
     public Blade(float x, float y, float width, float height, Array<TextureRegion> blades) {
         super(x, y, width, height);
@@ -84,5 +86,8 @@ public class Blade extends Entity {
     }
     public boolean isAttacking() {
         return isAttacking;
+    }
+    public int getDamage() {
+        return damage;
     }
 }

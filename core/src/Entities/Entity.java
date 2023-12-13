@@ -51,4 +51,13 @@ public class Entity extends Actor {
         return e1.hitbox.overlaps(e2.hitbox);
     }
 
+    @Override
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    @Override
+    public void setY(float y) {
+        this.y = y;
+    }
 }
