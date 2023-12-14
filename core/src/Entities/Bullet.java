@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Bullet {
@@ -80,5 +81,25 @@ public class Bullet {
     public void setDamage(int damage) {
         this.damage = damage;
     }
+    // Dada uma lista de tiles do mapa
+    public boolean isCollidingWithWall(Tiles[][] tiles) {
+        int leftTopTileX = (int)(position.x) / 16; // O tamanho do tile é 16
+        int leftTopTileY = (int)(position.y) / 16;
+        int rightBottomTileX = (int)(position.x + currentSprite.getRegionWidth()) / 16;
+        int rightBottomTileY = (int)(position.y + currentSprite.getRegionHeight()) / 16;
 
+        for (int x = leftTopTileX; x <= rightBottomTileX; x++) {
+            for (int y = leftTopTileY; y <= rightBottomTileY; y++) {
+                if(x < 0 || y < 0 || x >= tiles.length || y >= tiles[0].length) {
+                    continue;
+                }
+
+                if (tiles[x][y].getType().equals("wall")) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

@@ -36,4 +36,8 @@ public class Tiles {
     public String getType() {
         return type;
     }
+
+    public Rectangle getHitbox() {
+        return hitbox;
+    }
 }

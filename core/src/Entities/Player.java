@@ -39,16 +39,13 @@ public class Player extends Entity {
     private Crossbow crossbowGun;
     private Entities.Items.Crossbow crossbowItem;
     private Entities.Items.Sword swordItem;
-
     private String ammunitionString;
     private float damagedDuration = 0.3f;
     private boolean playerDamaged = false;
-
     private int Ammunition = 50;
 
     private LoadSprites loader;
     private float shootElapsedTime = 0;
-    private Crossbow crossbowGun1;
     private String direction;
     private Sword sword;
 
@@ -56,7 +53,6 @@ public class Player extends Entity {
         super(x, y, width, height);
         this.sprites = sprites;
         this.loader = loader;
-        this.crossbowGun = null;
         for (int i = 0; i < 4; i++) {
             RightSprites.add(sprites.get(i));
             LeftSprites.add(sprites.get(i + 5));
@@ -181,7 +177,7 @@ public class Player extends Entity {
             }
 
             if (crossbowItem != null && Entity.isColliding(this, crossbowItem)) {
-                crossbowGun1 = new Entities.Guns.Crossbow(getX(), getY(), 16, 16, loader.getSprites("CrossbowGun"), loader);
+                crossbowGun = new Entities.Guns.Crossbow(getX(), getY(), 16, 16, loader.getSprites("CrossbowGun"), loader);
                 crossbowItem = null;
             }
             if (swordItem != null && Entity.isColliding(this, swordItem)) {
@@ -270,7 +266,7 @@ public class Player extends Entity {
                         sword.setPosition(getX(), getY());  // atualizar posição da espada
                     }
                     enemy.setSpeed(0.0f); // Para o inimigo
-                    enemyStopTime = 30f; // Define o tempo que o inimigo ficará parado
+                    enemyStopTime = 10f; // Define o tempo que o inimigo ficará parado
 
                     // Guarda o sprite anterior e muda para o sprite de dano
                     previousSprite = SpriteCurrent;

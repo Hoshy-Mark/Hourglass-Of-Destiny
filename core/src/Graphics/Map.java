@@ -200,4 +200,7 @@ public class Map {
         layer.setCell(x, y, cell);
         tiles[x][y] = tile;
     }
+    public Tiles[][] getTiles() {
+        return tiles;
+    }
 }

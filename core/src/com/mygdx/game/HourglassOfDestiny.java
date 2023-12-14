@@ -50,7 +50,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		loader = new LoadSprites();
 		currentNivel = 0;
 
-		map = new Map("Levels/level"+currentNivel+".png",loader);
+		map = new Map("Levels/level" + currentNivel +".png",loader);
 		levelBuilder = new LevelBuilder(loader);
 
 		player = levelBuilder.createPlayer(map.getPosition("Player")[0]*16, map.getPosition("Player")[1]*16, loader);
@@ -61,7 +61,9 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		arrows = levelBuilder.createArrows(map.getArrowsListed());
 		crossbowItem = levelBuilder.createCrossbow(map.getPosition("Crossbow")[0]*16, map.getPosition("Crossbow")[1]*16);
 		crossbowGun = null;
-		swordItem = levelBuilder.createSword(map.getPosition("Sword")[0]*16,map.getPosition("Sword")[1]*16);
+		if (map.getPosition("Sword") != null) {
+			swordItem = levelBuilder.createSword(map.getPosition("Sword")[0]*16,map.getPosition("Sword")[1]*16);
+		}
 		bullets = new ArrayList<Bullet>();
 		portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0]*16, map.getPosition("PortalUp")[1]*16);
 		portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0]*16, map.getPosition("PortalDown")[1]*16);
@@ -207,8 +209,9 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 			bullet.update(Gdx.graphics.getDeltaTime()); // Atualiza a posição da bala.
 
 			if (bullet.getPosition().x < 0 || bullet.getPosition().x > Gdx.graphics.getWidth()
-					|| bullet.getPosition().y < 0 || bullet.getPosition().y > Gdx.graphics.getHeight()) {
-				// Se a bala saiu da tela, remove-a da lista.
+					|| bullet.getPosition().y < 0 || bullet.getPosition().y > Gdx.graphics.getHeight()
+					|| bullet.isCollidingWithWall(map.getTiles())) {  // Verifique a colisão com a parede
+				// Se a bala saiu da tela ou colidiu com uma parede, remove-a da lista.
 				bulletIterator.remove();
 			} else {
 				// Se a bala ainda está na tela, desenha-a.
