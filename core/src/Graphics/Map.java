@@ -25,6 +25,7 @@ public class Map {
     private ArrayList<Point> enemiesListed;
     private ArrayList<Point> arrowsListed;
     private ArrayList<Point> medicalKitsListed;
+    private ArrayList<Point> chestListed;
 
     public Map(String Map, LoadSprites Sprites) {
         this.positions = new HashMap<>();
@@ -32,6 +33,7 @@ public class Map {
         layer = new TiledMapTileLayer(pixmap.getWidth(), pixmap.getHeight(), 16, 16); // 16x16 é o tamanho de cada tile
         tiles = new Tiles[pixmap.getWidth()][pixmap.getHeight()]; // Inicialização da nova matriz de Tiles
         enemiesListed = new ArrayList<>();
+        chestListed = new ArrayList<>();
         arrowsListed = new ArrayList<>();
         medicalKitsListed = new ArrayList<>();
 
@@ -108,6 +110,7 @@ public class Map {
                         }
                         else if(green == 53 && red== 122){
                             //bau (pixel marrom)
+                            chestListed.add(new Point(x, y));
                             setCellAndTile(x, y,"Grass1",new Tiles(x, y, 16, 16, sprite, "floor"),Sprites);
 
                         }
@@ -202,5 +205,9 @@ public class Map {
     }
     public Tiles[][] getTiles() {
         return tiles;
+    }
+
+    public ArrayList<Point> getChestListed() {
+        return chestListed;
     }
 }
