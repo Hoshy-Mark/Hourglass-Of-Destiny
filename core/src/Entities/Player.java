@@ -38,7 +38,6 @@ public class Player extends Entity {
     private Sprite previousSprite;
     private Crossbow crossbowGun;
     private Entities.Items.Crossbow crossbowItem;
-    private Entities.Items.Sword swordItem;
     private String ammunitionString;
     private float damagedDuration = 0.3f;
     private boolean playerDamaged = false;
@@ -48,6 +47,7 @@ public class Player extends Entity {
     private float shootElapsedTime = 0;
     private String direction;
     private Sword sword;
+    private String currentWeapon;
 
     public Player(float x, float y, float width, float height, Array<TextureRegion> sprites,  LoadSprites loader) {
         super(x, y, width, height);
@@ -69,10 +69,11 @@ public class Player extends Entity {
             SpriteCurrent = new Sprite(RightSprites.get(1));
             previousSprite = new Sprite(RightSprites.get(1)); //inicializa o previousSprite com o valor inicial de SpriteCurrent
         }
+        currentWeapon = "sword";
         updateLifeString();
     }
 
-    public void act(float delta, Map map, ArrayList<Enemy> enemies, Crossbow crossbow, Entities.Items.Sword swordItem) {
+    public void act(float delta, Map map, ArrayList<Enemy> enemies, ArrayList<Bullet> bullets) {
 
         super.act(delta);
         checkEnemyCollision(enemies);
@@ -104,6 +105,7 @@ public class Player extends Entity {
                 if (!isCollidingWithEnemy(enemies)) {
                     this.move("left", delta, map);
                     if (crossbowGun != null) {
+                        crossbowGun.setPosition(this.getX()+4, this.getY()-3);
                         crossbowGun.setOrientation("left");
                     }
                     if (sword != null) {
@@ -116,6 +118,7 @@ public class Player extends Entity {
                 if (!isCollidingWithEnemy(enemies)) {
                     this.move("right", delta, map);
                     if (crossbowGun != null) {
+                        crossbowGun.setPosition(this.getX()+4, this.getY()-3);
                         crossbowGun.setOrientation("right");
                     }
                     if (sword != null) {
@@ -131,6 +134,7 @@ public class Player extends Entity {
                     this.move("up", delta, map);
                     moving = true;
                     if (crossbowGun != null) {
+                        crossbowGun.setPosition(this.getX()+4, this.getY()-3);
                         crossbowGun.setOrientation("up");
                     }
                     if (sword != null) {
@@ -146,6 +150,7 @@ public class Player extends Entity {
                     this.move("down", delta, map);
                     moving = true;
                     if (crossbowGun != null) {
+                        crossbowGun.setPosition(this.getX()+4, this.getY()-3);
                         crossbowGun.setOrientation("down");
                     }
                     if (sword != null) {
@@ -162,27 +167,27 @@ public class Player extends Entity {
             } else {
                 speed = 60;
             }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)) {
+                currentWeapon = "sword";
+            } else if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)) {
+                if (crossbowGun != null) {
+                    currentWeapon = "crossbow";
+                } else {
+                    currentWeapon = "sword";
+                }
+            }
             if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                if (sword != null && !sword.isAttacking()) { // certifique-se de que a espada está disponível e não está atualmente atacando antes de atacar
+                if (sword != null && !sword.isAttacking() && currentWeapon.equals("sword")) { // certifique-se de que a espada está disponível e não está atualmente atacando antes de atacar
                     sword.setOrientation(currentAnimation == animationRight ? "right" : "left");
                     sword.attack();
+                } else if(crossbowGun != null && Ammunition > 0 && this.getShootElapsedTime() >= 0.3f && currentWeapon.equals("crossbow")){
+                    bullets.add(this.getCrossbow().shoot());
+                    this.setAmmunition(this.getAmmunition() - 1); // diminui a munição do jogador a cada tiro
+                    this.setShootElapsedTime(0);  // reset the shootElapsedTime each time you shoot.
                 }
             }
             if(sword != null){
                 sword.act(delta);
-            }
-            if (crossbow != null && Entity.isColliding(this, crossbow)) {
-                this.crossbowGun = crossbow;
-                crossbow = null;
-            }
-
-            if (crossbowItem != null && Entity.isColliding(this, crossbowItem)) {
-                crossbowGun = new Entities.Guns.Crossbow(getX(), getY(), 16, 16, loader.getSprites("CrossbowGun"), loader);
-                crossbowItem = null;
-            }
-            if (swordItem != null && Entity.isColliding(this, swordItem)) {
-                sword = new Entities.Blades.Sword(this.getX(),this.getY(), 16, 16, loader.getSprites("Sword"));
-                swordItem = null;
             }
 
             // Reseta o sprite para o sprite anterior se o tempo
@@ -244,11 +249,10 @@ public class Player extends Entity {
     }
     public void draw(Batch batch){
         SpriteCurrent.draw(batch);
-        if(crossbowGun != null) {
-            crossbowGun.draw(batch);
-        }
-        if(sword != null) {
+        if (currentWeapon.equals("sword") && sword != null) {
             sword.draw(batch);
+        } else if (currentWeapon.equals("crossbow") && crossbowGun != null) {
+            crossbowGun.draw(batch);
         }
     }
 
@@ -374,5 +378,11 @@ public class Player extends Entity {
                 return true;
         }
         return false;
+    }
+    public void setSword(Sword sword) {
+        this.sword = sword;
+    }
+    public void setCrossbow(Crossbow crossbow){
+        this.crossbowGun = crossbow;
     }
 }

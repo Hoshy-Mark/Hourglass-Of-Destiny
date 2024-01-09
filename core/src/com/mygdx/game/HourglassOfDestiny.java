@@ -1,17 +1,16 @@
 package com.mygdx.game;
 
 import Entities.*;
+import Entities.Blades.Sword;
 import Entities.Items.Arrow;
 import Entities.Items.Crossbow;
 import Entities.Items.MedicalKit;
-import Entities.Items.Sword;
 import Graphics.LevelBuilder;
 import Graphics.LoadSprites;
 import Graphics.Map;
 import Graphics.PlayerUI;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -38,98 +37,44 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	private ArrayList<MedicalKit> medicalKits;
 	private ArrayList<Arrow> arrows;
 	private ArrayList<Bullet> bullets;
-	private int currentNivel;
+	private int currentNivel = 0;
 	private Portal portalUp;
 	private Portal portalDown;
-	private Sword swordItem;
+	private ArrayList<Chest> chest;
 	private Entities.Blades.Sword sword;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera(1280, 720);
 		loader = new LoadSprites();
-		currentNivel = 0;
 
-		map = new Map("Levels/level" + currentNivel +".png",loader);
+		map = new Map("Levels/levelTest.png",loader);
 		levelBuilder = new LevelBuilder(loader);
-
-		player = levelBuilder.createPlayer(map.getPosition("Player")[0]*16, map.getPosition("Player")[1]*16, loader);
-		enemies = levelBuilder.createEnemies(map.getEnemiesListed(), player);
 		mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 1f, batch);
-		playerUI = new PlayerUI(batch, player);
-		medicalKits = levelBuilder.createMedicalKits(map.getMedicalKitsListed());
-		arrows = levelBuilder.createArrows(map.getArrowsListed());
-		crossbowItem = levelBuilder.createCrossbow(map.getPosition("Crossbow")[0]*16, map.getPosition("Crossbow")[1]*16);
-		crossbowGun = null;
-		if (map.getPosition("Sword") != null) {
-			swordItem = levelBuilder.createSword(map.getPosition("Sword")[0]*16,map.getPosition("Sword")[1]*16);
-		}
-		bullets = new ArrayList<Bullet>();
+
+		createPlayer();
+		createEnemies();
+		createGameItems();
+
 		portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0]*16, map.getPosition("PortalUp")[1]*16);
 		portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0]*16, map.getPosition("PortalDown")[1]*16);
 
+		crossbowGun = null;
 	}
-
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // Limpar a tela
 		float delta = Gdx.graphics.getDeltaTime();  // Obtem o tempo entre frames
 
-		player.act(delta, map, enemies, crossbowGun, swordItem);
+		updatePlayer(delta);
+		updateEnemies(delta);
+		updateGameItems(delta);
+		handleCollision(delta);
 
-		if (enemies.isEmpty() && Entity.isColliding(player, portalUp)) {
-			currentNivel++;
-			System.out.println(currentNivel);
-			if (currentNivel < 0) currentNivel = 0;  // Limita o nível mínimo a 0
-			reloadLevel();
-		}
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		if (enemies.isEmpty() && Entity.isColliding(player, portalDown)) {
-			currentNivel++;
-			System.out.println(currentNivel);
-			if (currentNivel < 0) currentNivel = 0;  // Limita o nível mínimo a 0
-			reloadLevel();
-		}
-
-		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-			if(player.getCrossbow() != null && player.getAmmunition() > 0 && player.getShootElapsedTime() >= 0.3f){
-				bullets.add(player.getCrossbow().shoot());
-				player.setAmmunition(player.getAmmunition() - 1); // diminui a munição do jogador a cada tiro
-				player.setShootElapsedTime(0);  // reset the shootElapsedTime each time you shoot.
-			}
-		}
-		for(Enemy enemy : enemies) {
-			enemy.act(delta);
-		}
-
-		portalUp.act(delta);
-		portalDown.act(delta);
-
-		for(MedicalKit medkit : medicalKits) {
-			medkit.update(delta);
-		}
-
-		if(crossbowItem != null) {
-			crossbowItem.update(delta);
-		}
-
-		Iterator<Enemy> enemyIterator = enemies.iterator(); // Criação de um iterator para iterar sobre os inimigos
-		while (enemyIterator.hasNext()) {
-			Enemy enemy = enemyIterator.next();
-			enemy.act(delta);
-			if(player.getSword() != null) {
-				Blade blade = player.getSword();
-				if(blade.isAttacking() && Entity.isColliding(blade, enemy)) {
-					enemy.setLife(enemy.getLife() - blade.getDamage());
-					enemy.setDamaged(true);
-				}
-				// Verifica se a vida do inimigo é menor ou igual a zero
-				if (enemy.getLife() <= 0) {
-					enemyIterator.remove(); // Se sim, remove o inimigo
-				}
-			}
-		}
 		camera.zoom = 0.2f; // 2 vezes mais zoom do que o normal
 		camera.update();
 
@@ -140,88 +85,15 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 		batch.begin(); // Iniciar o desenho
 
-		player.draw(batch); // Desenha o 'player'
-
-
-		for(Enemy enemy : enemies) {
-			enemy.draw(batch);
-		}
+		renderPlayer();
+		renderEnemies();
+		renderGameItems();
 
 		if(enemies.isEmpty()) {
 			portalUp.draw(batch);
 			portalDown.draw(batch);
 		}
 
-		if(crossbowItem != null && Entity.isColliding(player, crossbowItem) && crossbowGun == null) {
-			crossbowGun = new Entities.Guns.Crossbow(player.getX(),player.getY(), 16, 16, loader.getSprites("Crossbow"), loader);
-			crossbowItem = null;
-		}
-
-		if(player.getCrossbow() == null && crossbowItem != null && crossbowGun == null) {
-			crossbowItem.draw(batch);
-		}
-		if(crossbowGun != null) {
-			crossbowGun.setPosition(player.getX()+4,player.getY()-3);
-			crossbowGun.draw(batch);
-		}
-		if(swordItem != null && Entity.isColliding(player, swordItem) && sword == null) {
-			sword = new Entities.Blades.Sword(player.getX(),player.getY(), 16, 16, loader.getSprites("Sword"));
-			swordItem = null;
-		}
-
-		if(player.getSword() == null && swordItem != null && sword == null) {
-			swordItem.draw(batch);
-		}
-
-		for (Bullet bullet : bullets) {
-			bullet.update(Gdx.graphics.getDeltaTime()); // Atualiza a posição da bala.
-			batch.draw(bullet.getCurrentSprite(), bullet.getPosition().x, bullet.getPosition().y);
-		}
-
-		checkBulletCollision(delta);
-
-		Iterator<MedicalKit> medkitIter = medicalKits.iterator();
-		while(medkitIter.hasNext()){
-			MedicalKit medkit = medkitIter.next();
-			if(medkit != null && Entity.isColliding(player, medkit)){
-				player.receiveHealth(medkit.use());
-				medkitIter.remove();
-			} else {
-				medkit.update(delta);
-				medkit.draw(batch);
-			}
-		}
-
-		Iterator<Arrow> arrowIter = arrows.iterator();
-		while(arrowIter.hasNext()){
-			Arrow arrow = arrowIter.next();
-			if(arrow != null && Entity.isColliding(player, arrow)){
-				player.setAmmunition(player.getAmmunition() + 5);         // add this line to increase ammo
-				arrowIter.remove();
-			} else {
-				arrow.draw(batch);
-			}
-		}
-
-		Iterator<Bullet> bulletIterator = bullets.iterator();
-		while (bulletIterator.hasNext()) {
-			Bullet bullet = bulletIterator.next();
-			bullet.update(Gdx.graphics.getDeltaTime()); // Atualiza a posição da bala.
-
-			if (bullet.getPosition().x < 0 || bullet.getPosition().x > Gdx.graphics.getWidth()
-					|| bullet.getPosition().y < 0 || bullet.getPosition().y > Gdx.graphics.getHeight()
-					|| bullet.isCollidingWithWall(map.getTiles())) {  // Verifique a colisão com a parede
-				// Se a bala saiu da tela ou colidiu com uma parede, remove-a da lista.
-				bulletIterator.remove();
-			} else {
-				// Se a bala ainda está na tela, desenha-a.
-				batch.draw(bullet.getCurrentSprite(), bullet.getPosition().x, bullet.getPosition().y);
-			}
-		}
-
-		for(Arrow arrow : arrows) {
-			arrow.draw(batch);
-		}
 
 		batch.end(); // Finalizar o desenho
 
@@ -268,7 +140,6 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 					if (enemy.getLife() <= 0) {
 						enemy.setDamaged(true);
 						enemy.act(delta);
-						enemy.draw(batch);
 						enemyIterator.remove();
 					}
 
@@ -297,5 +168,249 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		bullets = new ArrayList<Bullet>();
 		portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0]*16, map.getPosition("PortalUp")[1]*16);
 		portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0]*16, map.getPosition("PortalDown")[1]*16);
+	}
+
+	private void createPlayer() {
+		player = levelBuilder.createPlayer(map.getPosition("Player")[0]*16, map.getPosition("Player")[1]*16, loader);
+		playerUI = new PlayerUI(batch, player);
+		Sword sword = new Sword(player.getX()-8,player.getY()+3,16,16,loader.getSprites("Sword"));
+		player.setSword(sword);
+	}
+
+	private void createEnemies() {
+		enemies = levelBuilder.createEnemies(map.getEnemiesListed(), player);
+	}
+
+	private void createGameItems() {
+
+		// Criar kits médicos
+		medicalKits = levelBuilder.createMedicalKits(map.getMedicalKitsListed());
+
+		// Criar flechas
+		arrows = levelBuilder.createArrows(map.getArrowsListed());
+
+		// Criar baús
+		chest = levelBuilder.createChests(map.getChestListed());
+
+		// Criar besta
+		crossbowItem = levelBuilder.createCrossbow(map.getPosition("Crossbow")[0]*16, map.getPosition("Crossbow")[1]*16);
+
+		// Inicializar balas
+		bullets = new ArrayList<Bullet>();
+	}
+	private void updatePlayer(float delta) {
+		player.act(delta, map, enemies, bullets);
+
+		// Verifica colisão com a Besta
+		if(crossbowItem != null && Entity.isColliding(player, crossbowItem) && crossbowGun == null) {
+			crossbowGun = new Entities.Guns.Crossbow(player.getX(),player.getY(), 16, 16, loader.getSprites("Crossbow"), loader);
+			crossbowItem = null;
+			player.setCrossbow(crossbowGun);
+		}
+
+		// Verifica colisões com o MedicalKit
+		Iterator<MedicalKit> medkitIter = medicalKits.iterator();
+		while(medkitIter.hasNext()){
+			MedicalKit medkit = medkitIter.next();
+			if(medkit != null && Entity.isColliding(player, medkit)) {
+				player.receiveHealth(medkit.use());
+				medkitIter.remove();
+			}
+		}
+
+		// Verifica colisões com Arrow
+		Iterator<Arrow> arrowIter = arrows.iterator();
+		while(arrowIter.hasNext()){
+			Arrow arrow = arrowIter.next();
+			if(arrow != null && Entity.isColliding(player, arrow)){
+				player.setAmmunition(player.getAmmunition() + 5);
+				arrowIter.remove();
+			}
+		}
+	}
+
+	private void updateEnemies(float delta) {
+		for(Enemy enemy : enemies) {
+			enemy.act(delta);
+		}
+
+		Iterator<Enemy> enemyIterator = enemies.iterator();
+		while (enemyIterator.hasNext()) {
+			Enemy enemy = enemyIterator.next();
+			enemy.act(delta);
+			if(player.getSword() != null) {
+				Blade blade = player.getSword();
+				if(blade.isAttacking() && Entity.isColliding(blade, enemy)) {
+					enemy.setLife(enemy.getLife() - blade.getDamage());
+					enemy.setDamaged(true);
+				}
+				// Verifica se a vida do inimigo é menor ou igual a zero
+				if (enemy.getLife() <= 0) {
+					enemyIterator.remove(); // Se sim, remove o inimigo
+				}
+			}
+		}
+	}
+	private void updateGameItems(float delta) {
+		// atualizar medkits
+		for(MedicalKit medkit : medicalKits) {
+			medkit.update(delta);
+		}
+
+		// atualizar crossbowItem se existir
+		if(crossbowItem != null) {
+			crossbowItem.update(delta);
+		}
+
+		// atualizar balas
+		Iterator<Bullet> bulletIterator = bullets.iterator();
+		while (bulletIterator.hasNext()) {
+			Bullet bullet = bulletIterator.next();
+			bullet.update(delta); // Atualiza a posição da bala.
+
+			if (bullet.getPosition().x < 0 || bullet.getPosition().x > Gdx.graphics.getWidth()
+					|| bullet.getPosition().y < 0 || bullet.getPosition().y > Gdx.graphics.getHeight()
+					|| bullet.isCollidingWithWall(map.getTiles())) {  // Verifique a colisão com a parede
+				// Se a bala saiu da tela ou colidiu com uma parede, remove-a da lista.
+				bulletIterator.remove();
+			}
+		}
+	}
+
+	private void renderPlayer() {
+		player.draw(batch); // Desenha o 'player'
+
+		// Desenha a besta se o jogador tiver uma
+		if(player.getCrossbow() == null && crossbowItem != null && crossbowGun == null) {
+			crossbowItem.draw(batch);
+		}
+	}
+	private void renderEnemies() {
+		for(Enemy enemy : enemies) {
+			enemy.draw(batch);
+		}
+	}
+	private void renderGameItems() {
+		// Renderize os medkits
+		for(MedicalKit medkit : medicalKits) {
+			medkit.draw(batch);
+		}
+
+		// Renderize o item crossbow se o mesmo existir
+		if(crossbowItem != null) {
+			crossbowItem.draw(batch);
+		}
+
+		// Renderize as setas
+		for(Arrow arrow : arrows){
+			arrow.draw(batch);
+		}
+
+		// Renderize as balas
+		for (Bullet bullet : bullets) {
+			batch.draw(bullet.getCurrentSprite(), bullet.getPosition().x, bullet.getPosition().y);
+		}
+
+		// Renderiza o Chest
+		if(chest != null && enemies.isEmpty()){
+			for(Chest chest1: chest){
+				chest1.draw(batch);
+			}
+		}
+	}
+	private void handleCollision(float delta) {
+		// Verifica se o jogador colide com o portal
+		if (enemies.isEmpty() && Entity.isColliding(player, portalUp) || enemies.isEmpty() && Entity.isColliding(player, portalDown)) {
+			levelUp();
+		}
+
+		// Código para verificar a colisão entre a espada do jogador e os inimigos
+		handlePlayerEnemyCollision(delta);
+
+		// Código para verificar a colisão entre o jogador e um baú
+		handlePlayerChestCollision();
+
+		// Checa se o jogador colide com a besta
+		handlePlayerCrossbowCollision();
+
+		// Checa colisões de balas
+		checkBulletCollision(delta);
+
+		// Código para verificar a colisão entre o jogador e os medkits
+		handlePlayerMedicalKitCollision();
+
+		// Código para verificar a colisão entre o jogador e as flechas
+		handlePlayerArrowCollision();
+	}
+
+	private void handlePlayerEnemyCollision(float delta) {
+		Iterator<Enemy> enemyIterator = enemies.iterator();
+		while (enemyIterator.hasNext()) {
+			Enemy enemy = enemyIterator.next();
+			enemy.act(delta);
+			if(player.getSword() != null) {
+				Blade blade = player.getSword();
+				if(blade.isAttacking() && Entity.isColliding(blade, enemy)) {
+					enemy.setLife(enemy.getLife() - blade.getDamage());
+					enemy.setDamaged(true);
+				}
+				// Verifica se a vida do inimigo é menor ou igual a zero
+				if (enemy.getLife() <= 0) {
+					enemyIterator.remove(); // Se sim, remove o inimigo
+				}
+			}
+		}
+	}
+
+	private void handlePlayerChestCollision() {
+		if(enemies.isEmpty() && chest != null){
+			Iterator<Chest> chestIterator = chest.iterator();
+			while(chestIterator.hasNext()){
+				Chest chest1 = chestIterator.next();
+				if(chest1 != null && Entity.isColliding(player, chest1) && chest1.isOpened() == false){
+					chest1.openChest();
+				}
+			}
+		}
+	}
+
+	private void handlePlayerCrossbowCollision() {
+		// Verifica colisão com a Besta
+		if(crossbowItem != null && Entity.isColliding(player, crossbowItem) && crossbowGun == null) {
+			crossbowGun = new Entities.Guns.Crossbow(player.getX(),player.getY(), 16, 16, loader.getSprites("Crossbow"), loader);
+			crossbowItem = null;
+			player.setCrossbow(crossbowGun);
+		}
+	}
+
+	private void handlePlayerMedicalKitCollision() {
+		// Verifica colisões com o MedicalKit
+		Iterator<MedicalKit> medkitIter = medicalKits.iterator();
+		while(medkitIter.hasNext()){
+			MedicalKit medkit = medkitIter.next();
+			if(medkit != null && Entity.isColliding(player, medkit)) {
+				player.receiveHealth(medkit.use());
+				medkitIter.remove();
+			}
+		}
+	}
+
+	private void handlePlayerArrowCollision() {
+		// Verifica colisões com Arrow
+		Iterator<Arrow> arrowIter = arrows.iterator();
+		while(arrowIter.hasNext()){
+			Arrow arrow = arrowIter.next();
+			if(arrow != null && Entity.isColliding(player, arrow)){
+				player.setAmmunition(player.getAmmunition() + 5);
+				arrowIter.remove();
+			}
+		}
+	}
+
+	private void levelUp() {
+		currentNivel++;
+		System.out.println(currentNivel);
+		if (currentNivel < 0) currentNivel = 0;
+		reloadLevel();
 	}
 }
