@@ -37,8 +37,8 @@ public class Enemy extends Entity{
 
         // Armazena as sprites individuais para animações direita e esquerda nas respectivas listas
         for(int i = 0; i<4; i++){
-            RightSprites.add(sprites.get(i));
-            LeftSprites.add(sprites.get(i+5));
+            RightSprites.add(sprites.get(i+5));
+            LeftSprites.add(sprites.get(i));
         }
 
         // Define a sprite atual como a primeira sprite de direita
@@ -46,8 +46,8 @@ public class Enemy extends Entity{
 
         // Define array de sprites para o estado de dano
         DamageSprites = new Array<TextureRegion>();
-        DamageSprites.add(sprites.get(4));
         DamageSprites.add(sprites.get(9));
+        DamageSprites.add(sprites.get(4));
 
         // Cria animações para movimentos para a direita e para a esquerda usando as listas de sprites
         animationRight = new Animation<TextureRegion>(animationDuration, RightSprites);

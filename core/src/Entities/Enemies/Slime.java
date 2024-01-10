@@ -10,7 +10,7 @@ public class Slime extends Enemy {
         super(x, y, width, height, sprites, player);
         setLife(15);
         setDamage(1);
-        setSpeed(10);
+        setSpeed(15);
         setMaxViewDistance(100);
     }
 }
