@@ -272,8 +272,8 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 			medkit.update(delta);
 		}
 
-		// atualizar crossbowItem se existir
-		if (crossbowItem != null) {
+		// atualizar crossbowItem se existir alguma
+ 		if (crossbowItem != null) {
 			crossbowItem.update(delta);
 		}
 
