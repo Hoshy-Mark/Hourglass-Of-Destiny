@@ -19,9 +19,10 @@ public class Enemy extends Entity{
     private boolean isDamaged = false; // indica se o inimigo está atualmente sofrendo dano
     private int life = 15; // vida ou saúde do inimigo
     private int damage = 1; // quantidade de dano que o inimigo causa ao jogador
-    float stateTime = 0; // temporizador geral do estado que é usado para várias tarefas
+    private float stateTime = 0; // temporizador geral do estado que é usado para várias tarefas
     private float damagedDuration = 0.2f; // duração da animação de dano em segundos
-    float maxViewDistance = 50f; // A distância máxima em que o inimigo pode ver o jogador e atacar
+    private float maxViewDistance = 50f; // A distância máxima em que o inimigo pode ver o jogador e atacar
+    private int shotsHit = 0;
     private float originalSpeed;
     private String direction;
 
@@ -180,5 +181,17 @@ public class Enemy extends Entity{
     }
     public String getDirection() {
         return direction;
+    }
+
+    public Sprite getSpriteCurrent() {
+        return SpriteCurrent;
+    }
+
+    public int getShotsHit() {
+        return shotsHit;
+    }
+
+    public void setShotsHit(int shotsHit) {
+        this.shotsHit = shotsHit;
     }
 }

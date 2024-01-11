@@ -1,6 +1,7 @@
 package Entities;
 
 import Entities.Blades.Sword;
+import Entities.InteractiveObjects.Chest;
 import Graphics.LoadSprites;
 import Graphics.Map;
 import com.badlogic.gdx.Gdx;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import Entities.Guns.*;
 
@@ -73,7 +75,7 @@ public class Player extends Entity {
         updateLifeString();
     }
 
-    public void act(float delta, Map map, ArrayList<Enemy> enemies, ArrayList<Bullet> bullets) {
+    public void act(float delta, Map map, ArrayList<Enemy> enemies, ArrayList<Bullet> bullets, ArrayList<InteractiveObject> objects) {
 
         super.act(delta);
         checkEnemyCollision(enemies);
@@ -102,7 +104,7 @@ public class Player extends Entity {
         else {
 
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
-                if (!isCollidingWithEnemy(enemies)) {
+                if (!isCollidingWithEnemy(enemies) && !isCollidingWithInteractiveObject(objects, "left",delta)) {
                     this.move("left", delta, map);
                     if (crossbowGun != null) {
                         crossbowGun.setPosition(this.getX()+4, this.getY()-3);
@@ -115,7 +117,7 @@ public class Player extends Entity {
                     moving = true;
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
-                if (!isCollidingWithEnemy(enemies)) {
+                if (!isCollidingWithEnemy(enemies) && !isCollidingWithInteractiveObject(objects,"right",delta)) {
                     this.move("right", delta, map);
                     if (crossbowGun != null) {
                         crossbowGun.setPosition(this.getX()+4, this.getY()-3);
@@ -130,7 +132,7 @@ public class Player extends Entity {
             }
 
             if (Gdx.input.isKeyPressed(Input.Keys.UP )|| Gdx.input.isKeyPressed(Input.Keys.W)) {
-                if (!isCollidingWithEnemy(enemies)) {
+                if (!isCollidingWithEnemy(enemies) && !isCollidingWithInteractiveObject(objects,"up",delta)) {
                     this.move("up", delta, map);
                     moving = true;
                     if (crossbowGun != null) {
@@ -146,7 +148,7 @@ public class Player extends Entity {
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)|| Gdx.input.isKeyPressed(Input.Keys.S))  {
-                if (!isCollidingWithEnemy(enemies)) {
+                if (!isCollidingWithEnemy(enemies) && !isCollidingWithInteractiveObject(objects,"down",delta)) {
                     this.move("down", delta, map);
                     moving = true;
                     if (crossbowGun != null) {
@@ -384,5 +386,44 @@ public class Player extends Entity {
     }
     public void setCrossbow(Crossbow crossbow){
         this.crossbowGun = crossbow;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+    public boolean isCollidingWithInteractiveObject(ArrayList<InteractiveObject> objects, String direction, float delta) {
+        // Movimentação temporária
+        float oldX = this.getX();
+        float oldY = this.getY();
+
+        float speedDelta = speed * delta;
+
+        switch (direction) {
+            case "left":
+                this.setPosition(this.getX() - speedDelta, this.getY());
+                break;
+            case "right":
+                this.setPosition(this.getX() + speedDelta, this.getY());
+                break;
+            case "up":
+                this.setPosition(this.getX(), this.getY() + speedDelta);
+                break;
+            case "down":
+                this.setPosition(this.getX(), this.getY() - speedDelta);
+                break;
+        }
+
+        // Verifica colisões
+        for (InteractiveObject object : objects) {
+            if (isColliding(this, object.getCollisionRect())) {
+                // Restaura a posição
+                this.setPosition(oldX, oldY);
+                return true;
+            }
+        }
+
+        // Restaura a posição
+        this.setPosition(oldX, oldY);
+        return false;
     }
 }
