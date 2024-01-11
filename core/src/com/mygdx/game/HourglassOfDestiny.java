@@ -253,7 +253,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		while (enemyIterator.hasNext()) {
 			Enemy enemy = enemyIterator.next();
 
-			if (player.getSword() != null) {
+			if(player.getSword() != null) {
 				Blade blade = player.getSword();
 				if (blade.isAttacking() && Entity.isColliding(blade, enemy)) {
 					enemy.setLife(enemy.getLife() - blade.getDamage());
@@ -368,7 +368,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		while (enemyIterator.hasNext()) {
 			Enemy enemy = enemyIterator.next();
 
-			if (player.getSword() != null) {
+			if(player.getSword() != null) {
 				Blade blade = player.getSword();
 				if (blade.isAttacking() && Entity.isColliding(blade, enemy)) {
 					enemy.setLife(enemy.getLife() - blade.getDamage());
