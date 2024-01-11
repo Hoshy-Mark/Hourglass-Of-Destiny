@@ -50,6 +50,15 @@ public class Entity extends Actor {
     public static boolean isColliding(Entity e1, Entity e2) {
         return e1.hitbox.overlaps(e2.hitbox);
     }
+    public static boolean isColliding(Entity e1, Rectangle e2){
+        return e1.hitbox.overlaps(e2);
+    }
+    public static boolean isColliding(Rectangle e1, Rectangle e2){
+        return e1.overlaps(e2);
+    }
+    public static boolean isColliding(Rectangle e1, Entity e2){
+        return e1.overlaps(e2.hitbox);
+    }
 
     @Override
     public void setX(float x) {
@@ -59,5 +68,9 @@ public class Entity extends Actor {
     @Override
     public void setY(float y) {
         this.y = y;
+    }
+
+    public Rectangle getHitbox() {
+        return hitbox;
     }
 }
