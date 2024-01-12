@@ -51,4 +51,8 @@ public class Item extends Entity {
         SpriteCurrent.setPosition(this.getX(), this.getY());
         SpriteCurrent.draw(batch);
     }
+
+    public Sprite getSpriteCurrent() {
+        return SpriteCurrent;
+    }
 }

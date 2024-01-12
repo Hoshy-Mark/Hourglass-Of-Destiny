@@ -6,6 +6,7 @@ import Entities.InteractiveObjects.Chest;
 import Entities.Items.Arrow;
 import Entities.Items.Crossbow;
 import Entities.Items.MedicalKit;
+import Entities.Items.Ring;
 import Graphics.LevelBuilder;
 import Graphics.LoadSprites;
 import Graphics.Map;
@@ -21,6 +22,8 @@ import com.badlogic.gdx.math.MathUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import static com.badlogic.gdx.math.MathUtils.random;
 
 public class HourglassOfDestiny extends ApplicationAdapter {
 	private SpriteBatch batch;
@@ -38,6 +41,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 	private ArrayList<MedicalKit> medicalKits;
 	private ArrayList<Arrow> arrows;
+	private ArrayList<Ring> rings;
 	private ArrayList<InteractiveObject> objects;
 	private ArrayList<Bullet> bullets;
 	private int currentNivel = 0;
@@ -211,6 +215,8 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 		// Inicializar Objetos Interativos
 		objects = new ArrayList<InteractiveObject>();
+
+		rings = new ArrayList<Ring>();
 	}
 
 	private void updatePlayer(float delta) {
@@ -230,6 +236,20 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 			if (medkit != null && Entity.isColliding(player, medkit)) {
 				player.receiveHealth(medkit.use());
 				medkitIter.remove();
+			}
+		}
+
+		// Verifica colisões com o Rings
+		Iterator<Ring> ring = rings.iterator();
+		while (ring.hasNext()) {
+			Ring ring1 = ring.next();
+			if (ring1 != null && Entity.isColliding(player, ring1)) {
+				if(ring1.getType() == "speed"){
+					player.improveSpeed(ring1.getImprove());
+				} else if(ring1.getType() == "life"){
+					player.improveLife(ring1.getImprove());
+				}
+				ring.remove();
 			}
 		}
 
@@ -312,6 +332,13 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		// Renderize os medkits
 		for (MedicalKit medkit : medicalKits) {
 			medkit.draw(batch);
+		}
+
+		// Renderiza os Anéis
+		if(rings != null) {
+			for (Ring ring : rings) {
+				ring.draw(batch);
+			}
 		}
 
 		// Renderize o item crossbow se o mesmo existir
@@ -440,8 +467,16 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 	private void dropItems(String type, float x, float y, int ammunition) {
 		if (type == "Chest") {
-			Arrow arrow = new Arrow(x, y, 16, 16, new Sprite(loader.getSprite("Arrow")), ammunition);
-			arrows.add(arrow);
+			int randomNumber = random.nextInt(2);
+			if(randomNumber == 0){
+				Ring ring2 = new Ring(x, y, 16, 16, new Sprite(loader.getSprite("GreenRing")), "speed");
+				ring2.getSpriteCurrent().setScale(0.6f);
+				rings.add(ring2);
+			}else{
+				Ring ring2 = new Ring(x, y, 16, 16, new Sprite(loader.getSprite("RedRing")), "life");
+				ring2.getSpriteCurrent().setScale(0.6f);
+				rings.add(ring2);
+			}
 		}
 		if (type == "Enemy") {
 			Arrow arrow = new Arrow(x, y, 16, 16, new Sprite(loader.getSprite("Arrow")), ammunition);
