@@ -332,6 +332,13 @@ public class Player extends Entity {
     public String getLifeString() {
         return lifeString;
     }
+    public void improveLife(int improveLife){
+        maxLife += improveLife;
+        updateLifeString();
+    }
+    public void improveSpeed(int improveSpeed){
+        speed += improveSpeed;
+    }
     public void receiveHealth(int healthRecovered){
         life += healthRecovered;
         if (life > maxLife){
@@ -425,5 +432,9 @@ public class Player extends Entity {
         // Restaura a posição
         this.setPosition(oldX, oldY);
         return false;
+    }
+
+    public double getMaxLife() {
+        return maxLife;
     }
 }
