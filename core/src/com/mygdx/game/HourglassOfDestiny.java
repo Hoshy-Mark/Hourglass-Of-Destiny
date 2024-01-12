@@ -6,20 +6,24 @@ import Entities.InteractiveObjects.Chest;
 import Entities.Items.Arrow;
 import Entities.Items.Crossbow;
 import Entities.Items.MedicalKit;
+import Graphics.ImagesUI;
 import Entities.Items.Ring;
 import Graphics.LevelBuilder;
 import Graphics.LoadSprites;
 import Graphics.Map;
+import Entities.Items.Ring;
 import Graphics.PlayerUI;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
-
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -50,6 +54,10 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	private ArrayList<Chest> chest;
 	private Entities.Blades.Sword sword;
 
+	public static String gameState = "PLAY";
+
+	private ImagesUI imageUI;
+
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
@@ -76,10 +84,15 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // Limpar a tela
 		float delta = Gdx.graphics.getDeltaTime();  // Obtem o tempo entre frames
 
-		updatePlayer(delta);
-		updateEnemies(delta);
-		updateGameItems(delta);
-		handleCollision(delta);
+		if(gameState == "PLAY") {
+			updatePlayer(delta);
+			updateEnemies(delta);
+			updateGameItems(delta);
+			handleCollision(delta);
+		}
+		else if(gameState == "MENU"){
+
+		}
 
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -93,9 +106,23 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 		batch.begin(); // Iniciar o desenho
 
-		renderPlayer();
-		renderEnemies();
-		renderGameItems();
+		if(gameState == "PLAY") {
+			renderPlayer();
+			renderEnemies();
+			renderGameItems();
+		}
+
+		else if(gameState == "MENU"){
+
+			imageUI = new ImagesUI("ImagesUi/Menu"); // Substitua pelo nome da sua imagem
+			// Defina a posição da imagem, se necessário
+			imageUI.setPosition(-50, 245);
+
+			// Renderize a imagem usando a classe ImagesUI
+			imageUI.render(batch);
+
+		}
+
 
 		if (enemies.isEmpty()) {
 			portalUp.draw(batch);
@@ -465,7 +492,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		reloadLevel();
 	}
 
-	private void dropItems(String type, float x, float y, int ammunition) {
+    private void dropItems(String type, float x, float y, int ammunition) {
 		if (type == "Chest") {
 			int randomNumber = random.nextInt(2);
 			if(randomNumber == 0){
