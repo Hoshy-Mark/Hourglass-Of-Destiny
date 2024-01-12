@@ -89,6 +89,25 @@ public class Player extends Entity {
 
         Vector2 direction = new Vector2(worldCoordinates.x - this.getX(), worldCoordinates.y - this.getY()).nor();
 
+        float mouseX = worldCoordinates.x;
+        float playerX = this.getX();
+
+        if (mouseX > playerX) {
+            currentAnimation = animationRight;
+            curAnimation = "right";
+            if (sword != null) {
+                sword.setPosition(this.getX() + 2, this.getY() + 3);
+                sword.setOrientation("right");
+            }
+        } else if (mouseX < playerX) {
+            currentAnimation = animationLeft;
+            curAnimation = "left";
+            if (sword != null) {
+                sword.setPosition(this.getX() - 2, this.getY() + 3);
+                sword.setOrientation("left");
+            }
+        }
+
         if (crossbowGun != null) {
             crossbowGun.setOrientation(direction, curAnimation);
         }
@@ -122,10 +141,6 @@ public class Player extends Entity {
                     if (crossbowGun != null) {
                         crossbowGun.setPosition(this.getX()+4, this.getY()-3);
                     }
-                    if (sword != null) {
-                        sword.setPosition(this.getX() - 2, this.getY() + 3);
-                        sword.setOrientation("left");
-                    }
                     moving = true;
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
@@ -133,10 +148,6 @@ public class Player extends Entity {
                     this.move("right", delta, map);
                     if (crossbowGun != null) {
                         crossbowGun.setPosition(this.getX()+4, this.getY()-3);
-                    }
-                    if (sword != null) {
-                        sword.setPosition(this.getX() + 2, this.getY() + 3);
-                        sword.setOrientation("right");
                     }
                     moving = true;
                 }
@@ -237,16 +248,12 @@ public class Player extends Entity {
                     }
                     break;
                 case "right":
-                    currentAnimation = animationRight;
-                    curAnimation = "right";
                     // move para a direita
                     if (isAccessible(getX() + speed * delta, getY(), map)) {
                         setPosition(getX() + speed * delta, getY());
                     }
                     break;
                 case "left":
-                    currentAnimation = animationLeft;
-                    curAnimation = "left";
                     // move para a esquerda
                     if (isAccessible(getX() - speed * delta, getY(), map)) {
                         setPosition(getX() - speed * delta, getY());
