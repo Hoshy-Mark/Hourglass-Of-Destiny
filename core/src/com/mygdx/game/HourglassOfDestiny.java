@@ -56,7 +56,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		camera = new OrthographicCamera(1280, 720);
 		loader = new LoadSprites();
 
-		map = new Map("Levels/level"+ currentNivel + ".png",loader);
+		map = new Map("Levels/levelTest.png",loader);
 		levelBuilder = new LevelBuilder(loader);
 		mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 1f, batch);
 
