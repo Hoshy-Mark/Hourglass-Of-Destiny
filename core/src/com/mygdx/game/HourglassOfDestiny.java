@@ -9,6 +9,7 @@ import Graphics.ImagesUI;
 import Graphics.LevelBuilder;
 import Graphics.LoadSprites;
 import Graphics.Map;
+import Entities.Items.Ring;
 import Graphics.PlayerUI;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -19,7 +20,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
-
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -56,7 +57,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		camera = new OrthographicCamera(1280, 720);
 		loader = new LoadSprites();
 
-		map = new Map("Levels/level" + currentNivel + ".png",loader);
+		map = new Map("Levels/level" + currentNivel + ".png", loader);
 		levelBuilder = new LevelBuilder(loader);
 		mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 1f, batch);
 
@@ -440,6 +441,22 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		if (currentNivel < 0) currentNivel = 0;
 		reloadLevel();
 	}
-
-
+	private void dropItems(String type, float x, float y, int ammunition) {
+		if (type == "Chest") {
+			int randomNumber = random.nextInt(2);
+			if(randomNumber == 0){
+				Ring ring2 = new Ring(x, y, 16, 16, new Sprite(loader.getSprite("GreenRing")), "speed");
+				ring2.getSpriteCurrent().setScale(0.6f);
+				rings.add(ring2);
+			}else{
+				Ring ring2 = new Ring(x, y, 16, 16, new Sprite(loader.getSprite("RedRing")), "life");
+				ring2.getSpriteCurrent().setScale(0.6f);
+				rings.add(ring2);
+			}
+		}
+		if (type == "Enemy") {
+			Arrow arrow = new Arrow(x, y, 16, 16, new Sprite(loader.getSprite("Arrow")), ammunition);
+			arrows.add(arrow);
+		}
+	}
 }
