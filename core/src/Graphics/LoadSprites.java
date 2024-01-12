@@ -10,10 +10,13 @@ public class LoadSprites {
     private HashMap<String, Array<TextureRegion>> spritesheets;
     private HashMap<String, Texture> sprites;
 
+    private HashMap<String, Texture> imageUi;
+
     // Construtor
     public LoadSprites() {
         this.spritesheets = new HashMap<>();
         this.sprites = new HashMap<>();
+        this.imageUi = new HashMap<>();
 
         loadSpriteSheet("Crossbow","Sprites/Crossbow-sheet.png", 16, 16);
         loadSpriteSheet("CrossbowAnimation","Sprites/Crossbow Animation-sheet.png", 16, 16);
@@ -38,6 +41,7 @@ public class LoadSprites {
         loadSpriteSheet("Sword", "Sprites/Sword-sheet.png",16,16);
         loadSpriteSheet("Sword Power Up", "Sprites/Sword PowerUp-sheet.png",16,16);
         loadAllSprites();
+        loadAllImageUi();
     }
 
     // Metodo para carregar as imagens
@@ -57,6 +61,11 @@ public class LoadSprites {
         loadSprite("Arrow", "Sprites/Arrow.png");
         loadSprite("Sword", "Sprites/Sword.png");
     }
+    public void loadAllImageUi(){
+        loadimagesUI("Pause", "ImagesUi/Pause.png");
+        loadimagesUI("Menu", "ImagesUi/Menu.png");
+    }
+
     public void loadSpriteSheet(String keyName, String filePath, int spriteWidth, int spriteHeight) {
         Texture spritesheet = new Texture(Gdx.files.internal(filePath));
         TextureRegion[][] spriteRegions = TextureRegion.split(spritesheet, spriteWidth, spriteHeight);
@@ -80,4 +89,9 @@ public class LoadSprites {
     public Texture getSprite(String name){
         return sprites.get(name);
     }
+
+    public void loadimagesUI(String keyName, String filePath) {
+        imageUi.put(keyName, new Texture(Gdx.files.internal(filePath)));
+    }
+
 }
