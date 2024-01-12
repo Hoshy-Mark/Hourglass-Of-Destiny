@@ -2,10 +2,12 @@ package com.mygdx.game;
 
 import Entities.*;
 import Entities.Blades.Sword;
+import Entities.InteractiveObjects.Chest;
 import Entities.Items.Arrow;
 import Entities.Items.Crossbow;
 import Entities.Items.MedicalKit;
 import Graphics.ImagesUI;
+import Entities.Items.Ring;
 import Graphics.LevelBuilder;
 import Graphics.LoadSprites;
 import Graphics.Map;
@@ -16,6 +18,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -23,6 +26,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import static com.badlogic.gdx.math.MathUtils.random;
 
 public class HourglassOfDestiny extends ApplicationAdapter {
 	private SpriteBatch batch;
@@ -40,6 +45,8 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 	private ArrayList<MedicalKit> medicalKits;
 	private ArrayList<Arrow> arrows;
+	private ArrayList<Ring> rings;
+	private ArrayList<InteractiveObject> objects;
 	private ArrayList<Bullet> bullets;
 	private int currentNivel = 0;
 	private Portal portalUp;
@@ -52,7 +59,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	private ImagesUI imageUI;
 
 	@Override
-	public void create () {
+	public void create() {
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera(1280, 720);
 		loader = new LoadSprites();
@@ -65,13 +72,14 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		createEnemies();
 		createGameItems();
 
-		portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0]*16, map.getPosition("PortalUp")[1]*16);
-		portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0]*16, map.getPosition("PortalDown")[1]*16);
+		portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0] * 16, map.getPosition("PortalUp")[1] * 16);
+		portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0] * 16, map.getPosition("PortalDown")[1] * 16);
 
 		crossbowGun = null;
 	}
+
 	@Override
-	public void render () {
+	public void render() {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // Limpar a tela
 		float delta = Gdx.graphics.getDeltaTime();  // Obtem o tempo entre frames
@@ -116,7 +124,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		}
 
 
-		if(enemies.isEmpty()) {
+		if (enemies.isEmpty()) {
 			portalUp.draw(batch);
 			portalDown.draw(batch);
 		}
@@ -129,18 +137,21 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 		updateCamera(); // Atualiza a câmera para seguir o 'player'
 	}
+
 	public void updateCamera() {
 		float camX = MathUtils.clamp(player.getX(), -1000, 3600);
 		float camY = MathUtils.clamp(player.getY(), -1000, 3600);
 		camera.position.set(camX, camY, 0);
 		camera.update();
 	}
+
 	@Override
-	public void dispose () {
+	public void dispose() {
 		batch.dispose();// Limpar os recursos
 		mapRenderer.dispose(); // Disponibiliza os recursos do mapRenderer
 		playerUI.dispose();
 	}
+
 	public void checkBulletCollision(float delta) {
 		// Inicia a iteração sobre as balas
 		Iterator<Bullet> bulletIterator = bullets.iterator();
@@ -160,6 +171,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 					// Aqui implementamos o dano que a bala causa ao inimigo.
 					enemy.setLife(enemy.getLife() - bullet.getDamage());
+					enemy.setShotsHit(enemy.getShotsHit() + 1);
 
 					enemy.setDamaged(true);
 
@@ -168,6 +180,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 						enemy.setDamaged(true);
 						enemy.act(delta);
 						enemyIterator.remove();
+						dropItems("Enemy", enemy.getX(), enemy.getY(), enemy.getShotsHit());
 					}
 
 					// Removemos a bala da lista de balas depois de atingir o inimigo.
@@ -179,28 +192,30 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 			}
 		}
 	}
-	private void reloadLevel(){
-		map = new Map("Levels/level"+currentNivel+".png",loader);
+
+	private void reloadLevel() {
+		map = new Map("Levels/level" + currentNivel + ".png", loader);
 		// A posição do jogador é atualizada, mas o objeto não é recriado.
-		player.setPosition(map.getPosition("Player")[0]*16, map.getPosition("Player")[1]*16);
+		player.setPosition(map.getPosition("Player")[0] * 16, map.getPosition("Player")[1] * 16);
 		enemies = levelBuilder.createEnemies(map.getEnemiesListed(), player);
 		mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 1f, batch);
 		medicalKits = levelBuilder.createMedicalKits(map.getMedicalKitsListed());
 		arrows = levelBuilder.createArrows(map.getArrowsListed());
 		if (map.getPosition("Crossbow") != null) {
-			crossbowItem = levelBuilder.createCrossbow(map.getPosition("Crossbow")[0]*16, map.getPosition("Crossbow")[1]*16);
+			crossbowItem = levelBuilder.createCrossbow(map.getPosition("Crossbow")[0] * 16, map.getPosition("Crossbow")[1] * 16);
 		} else {
 			crossbowItem = null;
 		}
+		chest = levelBuilder.createChests(map.getChestListed());
 		bullets = new ArrayList<Bullet>();
-		portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0]*16, map.getPosition("PortalUp")[1]*16);
-		portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0]*16, map.getPosition("PortalDown")[1]*16);
+		portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0] * 16, map.getPosition("PortalUp")[1] * 16);
+		portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0] * 16, map.getPosition("PortalDown")[1] * 16);
 	}
 
 	private void createPlayer() {
-		player = levelBuilder.createPlayer(map.getPosition("Player")[0]*16, map.getPosition("Player")[1]*16, loader);
+		player = levelBuilder.createPlayer(map.getPosition("Player")[0] * 16, map.getPosition("Player")[1] * 16, loader);
 		playerUI = new PlayerUI(batch, player);
-		Sword sword = new Sword(player.getX()-8,player.getY()+3,16,16,loader.getSprites("Sword"));
+		Sword sword = new Sword(player.getX() - 8, player.getY() + 3, 16, 16, loader.getSprites("Sword"));
 		player.setSword(sword);
 	}
 
@@ -220,45 +235,64 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		chest = levelBuilder.createChests(map.getChestListed());
 
 		// Criar besta
-		crossbowItem = levelBuilder.createCrossbow(map.getPosition("Crossbow")[0]*16, map.getPosition("Crossbow")[1]*16);
+		crossbowItem = levelBuilder.createCrossbow(map.getPosition("Crossbow")[0] * 16, map.getPosition("Crossbow")[1] * 16);
 
 		// Inicializar balas
 		bullets = new ArrayList<Bullet>();
+
+		// Inicializar Objetos Interativos
+		objects = new ArrayList<InteractiveObject>();
+
+		rings = new ArrayList<Ring>();
 	}
+
 	private void updatePlayer(float delta) {
-		player.act(delta, map, enemies, bullets);
+		player.act(delta, map, enemies, bullets, objects, camera);
 
 		// Verifica colisão com a Besta
-		if(crossbowItem != null && Entity.isColliding(player, crossbowItem) && crossbowGun == null) {
-			crossbowGun = new Entities.Guns.Crossbow(player.getX(),player.getY(), 16, 16, loader.getSprites("Crossbow"), loader);
+		if (crossbowItem != null && Entity.isColliding(player, crossbowItem) && crossbowGun == null) {
+			crossbowGun = new Entities.Guns.Crossbow(player.getX(), player.getY(), 16, 16, loader.getSprites("Crossbow"), loader);
 			crossbowItem = null;
 			player.setCrossbow(crossbowGun);
 		}
 
 		// Verifica colisões com o MedicalKit
 		Iterator<MedicalKit> medkitIter = medicalKits.iterator();
-		while(medkitIter.hasNext()){
+		while (medkitIter.hasNext()) {
 			MedicalKit medkit = medkitIter.next();
-			if(medkit != null && Entity.isColliding(player, medkit)) {
+			if (medkit != null && Entity.isColliding(player, medkit)) {
 				player.receiveHealth(medkit.use());
 				medkitIter.remove();
 			}
 		}
 
+		// Verifica colisões com o Rings
+		Iterator<Ring> ring = rings.iterator();
+		while (ring.hasNext()) {
+			Ring ring1 = ring.next();
+			if (ring1 != null && Entity.isColliding(player, ring1)) {
+				if(ring1.getType() == "speed"){
+					player.improveSpeed(ring1.getImprove());
+				} else if(ring1.getType() == "life"){
+					player.improveLife(ring1.getImprove());
+				}
+				ring.remove();
+			}
+		}
+
 		// Verifica colisões com Arrow
 		Iterator<Arrow> arrowIter = arrows.iterator();
-		while(arrowIter.hasNext()){
+		while (arrowIter.hasNext()) {
 			Arrow arrow = arrowIter.next();
-			if(arrow != null && Entity.isColliding(player, arrow)){
-				player.setAmmunition(player.getAmmunition() + 5);
+			if (arrow != null && Entity.isColliding(player, arrow)) {
+				player.setAmmunition(player.getAmmunition() + arrow.getAmmunition());
 				arrowIter.remove();
 			}
 		}
 	}
 
 	private void updateEnemies(float delta) {
-
-		for(Enemy enemy : enemies) {
+		for (Enemy enemy : enemies) {
 			enemy.act(delta);
 		}
 
@@ -268,7 +302,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 			if(player.getSword() != null) {
 				Blade blade = player.getSword();
-				if(blade.isAttacking() && Entity.isColliding(blade, enemy)) {
+				if (blade.isAttacking() && Entity.isColliding(blade, enemy)) {
 					enemy.setLife(enemy.getLife() - blade.getDamage());
 					enemy.setDamaged(true);
 				}
@@ -279,14 +313,15 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 			}
 		}
 	}
+
 	private void updateGameItems(float delta) {
 		// atualizar medkits
-		for(MedicalKit medkit : medicalKits) {
+		for (MedicalKit medkit : medicalKits) {
 			medkit.update(delta);
 		}
 
-		// atualizar crossbowItem se existir
-		if(crossbowItem != null) {
+		// atualizar crossbowItem se existir alguma
+ 		if (crossbowItem != null) {
 			crossbowItem.update(delta);
 		}
 
@@ -309,28 +344,37 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		player.draw(batch); // Desenha o 'player'
 
 		// Desenha a besta se o jogador tiver uma
-		if(player.getCrossbow() == null && crossbowItem != null && crossbowGun == null) {
+		if (player.getCrossbow() == null && crossbowItem != null && crossbowGun == null) {
 			crossbowItem.draw(batch);
 		}
 	}
+
 	private void renderEnemies() {
-		for(Enemy enemy : enemies) {
+		for (Enemy enemy : enemies) {
 			enemy.draw(batch);
 		}
 	}
+
 	private void renderGameItems() {
 		// Renderize os medkits
-		for(MedicalKit medkit : medicalKits) {
+		for (MedicalKit medkit : medicalKits) {
 			medkit.draw(batch);
 		}
 
+		// Renderiza os Anéis
+		if(rings != null) {
+			for (Ring ring : rings) {
+				ring.draw(batch);
+			}
+		}
+
 		// Renderize o item crossbow se o mesmo existir
-		if(crossbowItem != null) {
+		if (crossbowItem != null) {
 			crossbowItem.draw(batch);
 		}
 
 		// Renderize as setas
-		for(Arrow arrow : arrows){
+		for (Arrow arrow : arrows) {
 			arrow.draw(batch);
 		}
 
@@ -340,12 +384,14 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		}
 
 		// Renderiza o Chest
-		if(chest != null && enemies.isEmpty()){
-			for(Chest chest1: chest){
+		if (chest != null && enemies.isEmpty()) {
+			for (Chest chest1 : chest) {
+				objects.add(chest1);
 				chest1.draw(batch);
 			}
 		}
 	}
+
 	private void handleCollision(float delta) {
 		// Verifica se o jogador colide com o portal
 		if (enemies.isEmpty() && Entity.isColliding(player, portalUp) || enemies.isEmpty() && Entity.isColliding(player, portalDown)) {
@@ -378,7 +424,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 			if(player.getSword() != null) {
 				Blade blade = player.getSword();
-				if(blade.isAttacking() && Entity.isColliding(blade, enemy)) {
+				if (blade.isAttacking() && Entity.isColliding(blade, enemy)) {
 					enemy.setLife(enemy.getLife() - blade.getDamage());
 					enemy.setDamaged(true);
 				}
@@ -391,12 +437,16 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	}
 
 	private void handlePlayerChestCollision() {
-		if(enemies.isEmpty() && chest != null){
+		if (enemies.isEmpty() && chest != null) {
 			Iterator<Chest> chestIterator = chest.iterator();
-			while(chestIterator.hasNext()){
+			while (chestIterator.hasNext()) {
 				Chest chest1 = chestIterator.next();
-				if(chest1 != null && Entity.isColliding(player, chest1) && chest1.isOpened() == false){
-					chest1.openChest();
+
+				if (chest1 != null && Entity.isColliding(player, chest1.getInteractionRect())) {
+					if (chest1.isOpened() == false) {
+						chest1.openChest();
+						dropItems("Chest", chest1.getX(), chest1.getY() - 16, 10);
+					}
 				}
 			}
 		}
@@ -404,8 +454,8 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 	private void handlePlayerCrossbowCollision() {
 		// Verifica colisão com a Besta
-		if(crossbowItem != null && Entity.isColliding(player, crossbowItem) && crossbowGun == null) {
-			crossbowGun = new Entities.Guns.Crossbow(player.getX(),player.getY(), 16, 16, loader.getSprites("Crossbow"), loader);
+		if (crossbowItem != null && Entity.isColliding(player, crossbowItem) && crossbowGun == null) {
+			crossbowGun = new Entities.Guns.Crossbow(player.getX(), player.getY(), 16, 16, loader.getSprites("Crossbow"), loader);
 			crossbowItem = null;
 			player.setCrossbow(crossbowGun);
 		}
@@ -414,9 +464,9 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	private void handlePlayerMedicalKitCollision() {
 		// Verifica colisões com o MedicalKit
 		Iterator<MedicalKit> medkitIter = medicalKits.iterator();
-		while(medkitIter.hasNext()){
+		while (medkitIter.hasNext()) {
 			MedicalKit medkit = medkitIter.next();
-			if(medkit != null && Entity.isColliding(player, medkit)) {
+			if (medkit != null && Entity.isColliding(player, medkit)) {
 				player.receiveHealth(medkit.use());
 				medkitIter.remove();
 			}
@@ -426,10 +476,10 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	private void handlePlayerArrowCollision() {
 		// Verifica colisões com Arrow
 		Iterator<Arrow> arrowIter = arrows.iterator();
-		while(arrowIter.hasNext()){
+		while (arrowIter.hasNext()) {
 			Arrow arrow = arrowIter.next();
-			if(arrow != null && Entity.isColliding(player, arrow)){
-				player.setAmmunition(player.getAmmunition() + 5);
+			if (arrow != null && Entity.isColliding(player, arrow)) {
+				player.setAmmunition(player.getAmmunition() + arrow.getAmmunition());
 				arrowIter.remove();
 			}
 		}
@@ -441,7 +491,8 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		if (currentNivel < 0) currentNivel = 0;
 		reloadLevel();
 	}
-	private void dropItems(String type, float x, float y, int ammunition) {
+
+    private void dropItems(String type, float x, float y, int ammunition) {
 		if (type == "Chest") {
 			int randomNumber = random.nextInt(2);
 			if(randomNumber == 0){

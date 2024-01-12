@@ -1,15 +1,19 @@
 package Entities;
 
 import Entities.Blades.Sword;
+import Entities.InteractiveObjects.Chest;
 import Graphics.LoadSprites;
 import Graphics.Map;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import Entities.Guns.*;
 
@@ -48,6 +52,7 @@ public class Player extends Entity {
     private String direction;
     private Sword sword;
     private String currentWeapon;
+    private String curAnimation;
 
     public Player(float x, float y, float width, float height, Array<TextureRegion> sprites,  LoadSprites loader) {
         super(x, y, width, height);
@@ -73,11 +78,40 @@ public class Player extends Entity {
         updateLifeString();
     }
 
-    public void act(float delta, Map map, ArrayList<Enemy> enemies, ArrayList<Bullet> bullets) {
+    public void act(float delta, Map map, ArrayList<Enemy> enemies, ArrayList<Bullet> bullets, ArrayList<InteractiveObject> objects, OrthographicCamera camera) {
 
         super.act(delta);
         checkEnemyCollision(enemies);
         boolean moving = false;
+
+        Vector3 screenCoordinates = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        Vector3 worldCoordinates = camera.unproject(screenCoordinates);    // camera é a câmera do seu jogo. Certifique-se de ter uma referência para ela nesta classe.
+
+        Vector2 direction = new Vector2(worldCoordinates.x - this.getX(), worldCoordinates.y - this.getY()).nor();
+
+        float mouseX = worldCoordinates.x;
+        float playerX = this.getX();
+
+        if (mouseX > playerX) {
+            currentAnimation = animationRight;
+            curAnimation = "right";
+            if (sword != null) {
+                sword.setPosition(this.getX() + 2, this.getY() + 3);
+                sword.setOrientation("right");
+            }
+        } else if (mouseX < playerX) {
+            currentAnimation = animationLeft;
+            curAnimation = "left";
+            if (sword != null) {
+                sword.setPosition(this.getX() - 2, this.getY() + 3);
+                sword.setOrientation("left");
+            }
+        }
+
+        if (crossbowGun != null) {
+            crossbowGun.setOrientation(direction, curAnimation);
+        }
+
 
         if (playerDamaged){
             if(currentAnimation == animationRight){
@@ -102,40 +136,29 @@ public class Player extends Entity {
         else {
 
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
-                if (!isCollidingWithEnemy(enemies)) {
+                if (!isCollidingWithEnemy(enemies) && !isCollidingWithInteractiveObject(objects, "left",delta)) {
                     this.move("left", delta, map);
                     if (crossbowGun != null) {
                         crossbowGun.setPosition(this.getX()+4, this.getY()-3);
-                        crossbowGun.setOrientation("left");
-                    }
-                    if (sword != null) {
-                        sword.setPosition(this.getX() - 2, this.getY() + 3);
-                        sword.setOrientation("left");
                     }
                     moving = true;
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
-                if (!isCollidingWithEnemy(enemies)) {
+                if (!isCollidingWithEnemy(enemies) && !isCollidingWithInteractiveObject(objects,"right",delta)) {
                     this.move("right", delta, map);
                     if (crossbowGun != null) {
                         crossbowGun.setPosition(this.getX()+4, this.getY()-3);
-                        crossbowGun.setOrientation("right");
-                    }
-                    if (sword != null) {
-                        sword.setPosition(this.getX() + 2, this.getY() + 3);
-                        sword.setOrientation("right");
                     }
                     moving = true;
                 }
             }
 
             if (Gdx.input.isKeyPressed(Input.Keys.UP )|| Gdx.input.isKeyPressed(Input.Keys.W)) {
-                if (!isCollidingWithEnemy(enemies)) {
+                if (!isCollidingWithEnemy(enemies) && !isCollidingWithInteractiveObject(objects,"up",delta)) {
                     this.move("up", delta, map);
                     moving = true;
                     if (crossbowGun != null) {
                         crossbowGun.setPosition(this.getX()+4, this.getY()-3);
-                        crossbowGun.setOrientation("up");
                     }
                     if (sword != null) {
                         if (sword.getDirection().equals("left")) {
@@ -146,12 +169,11 @@ public class Player extends Entity {
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)|| Gdx.input.isKeyPressed(Input.Keys.S))  {
-                if (!isCollidingWithEnemy(enemies)) {
+                if (!isCollidingWithEnemy(enemies) && !isCollidingWithInteractiveObject(objects,"down",delta)) {
                     this.move("down", delta, map);
                     moving = true;
                     if (crossbowGun != null) {
                         crossbowGun.setPosition(this.getX()+4, this.getY()-3);
-                        crossbowGun.setOrientation("down");
                     }
                     if (sword != null) {
                         if (sword.getDirection().equals("left")) {
@@ -162,6 +184,7 @@ public class Player extends Entity {
                     }
                 }
             }
+
             if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) {
                 speed = speedBoost;
             } else {
@@ -176,7 +199,7 @@ public class Player extends Entity {
                     currentWeapon = "sword";
                 }
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Buttons.LEFT)|| Gdx.input.isTouched()) {
                 if (sword != null && !sword.isAttacking() && currentWeapon.equals("sword")) { // certifique-se de que a espada está disponível e não está atualmente atacando antes de atacar
                     sword.setOrientation(currentAnimation == animationRight ? "right" : "left");
                     sword.attack();
@@ -225,14 +248,12 @@ public class Player extends Entity {
                     }
                     break;
                 case "right":
-                    currentAnimation = animationRight;
                     // move para a direita
                     if (isAccessible(getX() + speed * delta, getY(), map)) {
                         setPosition(getX() + speed * delta, getY());
                     }
                     break;
                 case "left":
-                    currentAnimation = animationLeft;
                     // move para a esquerda
                     if (isAccessible(getX() - speed * delta, getY(), map)) {
                         setPosition(getX() - speed * delta, getY());
@@ -330,6 +351,13 @@ public class Player extends Entity {
     public String getLifeString() {
         return lifeString;
     }
+    public void improveLife(int improveLife){
+        maxLife += improveLife;
+        updateLifeString();
+    }
+    public void improveSpeed(int improveSpeed){
+        speed += improveSpeed;
+    }
     public void receiveHealth(int healthRecovered){
         life += healthRecovered;
         if (life > maxLife){
@@ -384,5 +412,52 @@ public class Player extends Entity {
     }
     public void setCrossbow(Crossbow crossbow){
         this.crossbowGun = crossbow;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+    public boolean isCollidingWithInteractiveObject(ArrayList<InteractiveObject> objects, String direction, float delta) {
+        // Movimentação temporária
+        float oldX = this.getX();
+        float oldY = this.getY();
+
+        float speedDelta = speed * delta;
+
+        switch (direction) {
+            case "left":
+                this.setPosition(this.getX() - speedDelta, this.getY());
+                break;
+            case "right":
+                this.setPosition(this.getX() + speedDelta, this.getY());
+                break;
+            case "up":
+                this.setPosition(this.getX(), this.getY() + speedDelta);
+                break;
+            case "down":
+                this.setPosition(this.getX(), this.getY() - speedDelta);
+                break;
+        }
+
+        // Verifica colisões
+        for (InteractiveObject object : objects) {
+            if (isColliding(this, object.getCollisionRect())) {
+                // Restaura a posição
+                this.setPosition(oldX, oldY);
+                return true;
+            }
+        }
+
+        // Restaura a posição
+        this.setPosition(oldX, oldY);
+        return false;
+    }
+
+    public double getMaxLife() {
+        return maxLife;
+    }
+
+    public String getCurAnimation() {
+        return curAnimation;
     }
 }
