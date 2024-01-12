@@ -220,7 +220,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	}
 
 	private void updatePlayer(float delta) {
-		player.act(delta, map, enemies, bullets, objects);
+		player.act(delta, map, enemies, bullets, objects, camera);
 
 		// Verifica colisão com a Besta
 		if (crossbowItem != null && Entity.isColliding(player, crossbowItem) && crossbowGun == null) {
