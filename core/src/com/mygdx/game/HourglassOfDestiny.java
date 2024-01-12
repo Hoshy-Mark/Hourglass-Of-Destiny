@@ -46,7 +46,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	private ArrayList<Chest> chest;
 	private Entities.Blades.Sword sword;
 
-	public static String gameState = "MENU";
+	public static String gameState = "PLAY";
 
 	private ImagesUI imageUI;
 
@@ -56,7 +56,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		camera = new OrthographicCamera(1280, 720);
 		loader = new LoadSprites();
 
-		map = new Map("Levels/levelTest.png",loader);
+		map = new Map("Levels/level"+ currentNivel + ".png",loader);
 		levelBuilder = new LevelBuilder(loader);
 		mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 1f, batch);
 
