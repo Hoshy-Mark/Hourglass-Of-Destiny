@@ -11,21 +11,21 @@ import Entities.Items.Ring;
 import Graphics.LevelBuilder;
 import Graphics.LoadSprites;
 import Graphics.Map;
-import Entities.Items.Ring;
 import Graphics.PlayerUI;
+import Settings.GameSettings;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import java.util.ArrayList;
 import java.util.Iterator;
+import Settings.SaveState;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
@@ -57,24 +57,31 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	public static String gameState = "PLAY";
 
 	private ImagesUI imageUI;
+	private GameSettings gameSettings;
+	private FitViewport viewport;
+
 
 	@Override
 	public void create() {
+		Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
 		batch = new SpriteBatch();
-		camera = new OrthographicCamera(1280, 720);
+		camera = new OrthographicCamera(1920, 1080);
+		viewport = new FitViewport(1920, 1080, camera);
+		gameSettings = new GameSettings(viewport);
+
 		loader = new LoadSprites();
 
-		map = new Map("Levels/level" + currentNivel + ".png", loader);
+		map = new Map("Levels/levelTest.png", loader);
 		levelBuilder = new LevelBuilder(loader);
 		mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 1f, batch);
 
 		createPlayer();
 		createEnemies();
 		createGameItems();
-
-		portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0] * 16, map.getPosition("PortalUp")[1] * 16);
-		portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0] * 16, map.getPosition("PortalDown")[1] * 16);
-
+		if(portalUp != null && portalDown != null) {
+			portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0] * 16, map.getPosition("PortalUp")[1] * 16);
+			portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0] * 16, map.getPosition("PortalDown")[1] * 16);
+		}
 		crossbowGun = null;
 	}
 
@@ -92,6 +99,36 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		}
 		else if(gameState == "MENU"){
 
+		}
+
+		//Full Screen
+		if(Gdx.input.isKeyPressed(Input.Keys.K)){
+			Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+		}
+		//Janela
+		if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
+			Gdx.graphics.setWindowedMode(1080, 720);
+		}
+		//Fechar o Jogo
+		if(Gdx.input.isKeyPressed(Input.Keys.P)){
+			Gdx.app.exit();
+		}
+		//Save
+		if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
+			SaveState saveState = new SaveState();
+			saveState.saveGame((float)player.getLife(),player.getAmmunition());
+		}
+		//Load
+		if(Gdx.input.isKeyPressed(Input.Keys.NUM_6)){
+			SaveState saveState = new SaveState();
+			player.setLife(saveState.getLife());
+			player.setAmmunition(saveState.getAmmunition());
+		}
+		//Apagar Save
+		if(Gdx.input.isKeyPressed(Input.Keys.NUM_0)){
+			SaveState saveState = new SaveState();
+			saveState.getPrefs().clear();
+			saveState.getPrefs().flush(); // Isto salvará as preferências
 		}
 
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -123,12 +160,12 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 		}
 
-
-		if (enemies.isEmpty()) {
-			portalUp.draw(batch);
-			portalDown.draw(batch);
+		if(portalUp != null && portalDown != null) {
+			if (enemies.isEmpty()) {
+				portalUp.draw(batch);
+				portalDown.draw(batch);
+		 	}
 		}
-
 
 		batch.end(); // Finalizar o desenho
 
@@ -331,10 +368,8 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 			Bullet bullet = bulletIterator.next();
 			bullet.update(delta); // Atualiza a posição da bala.
 
-			if (bullet.getPosition().x < 0 || bullet.getPosition().x > Gdx.graphics.getWidth()
-					|| bullet.getPosition().y < 0 || bullet.getPosition().y > Gdx.graphics.getHeight()
-					|| bullet.isCollidingWithWall(map.getTiles())) {  // Verifique a colisão com a parede
-				// Se a bala saiu da tela ou colidiu com uma parede, remove-a da lista.
+			if (bullet.isCollidingWithWall(map.getTiles())) {  // Verifique a colisão com a parede
+				// Se a bala colidiu com uma parede, remove-a da lista.
 				bulletIterator.remove();
 			}
 		}
@@ -394,10 +429,11 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 	private void handleCollision(float delta) {
 		// Verifica se o jogador colide com o portal
-		if (enemies.isEmpty() && Entity.isColliding(player, portalUp) || enemies.isEmpty() && Entity.isColliding(player, portalDown)) {
-			levelUp();
+		if(portalUp != null && portalDown != null) {
+			if (enemies.isEmpty() && Entity.isColliding(player, portalUp) || enemies.isEmpty() && Entity.isColliding(player, portalDown)) {
+				levelUp();
+			}
 		}
-
 		// Código para verificar a colisão entre a espada do jogador e os inimigos
 		handlePlayerEnemyCollision(delta);
 
@@ -509,5 +545,12 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 			Arrow arrow = new Arrow(x, y, 16, 16, new Sprite(loader.getSprite("Arrow")), ammunition);
 			arrows.add(arrow);
 		}
+	}
+	@Override
+	public void resize(int width, int height) {
+		camera.viewportWidth = width;
+		camera.viewportHeight = height;
+		camera.update();
+		playerUI.resize(width, height);
 	}
 }
