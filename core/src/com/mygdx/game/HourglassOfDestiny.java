@@ -60,8 +60,19 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 	@Override
 	public void create() {
+
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera(1280, 720);
+
+    
+		Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+		
+    batch = new SpriteBatch();
+		camera = new OrthographicCamera(1920, 1080);
+		viewport = new FitViewport(1920, 1080, camera);
+		gameSettings = new GameSettings(viewport);
+
+
 		loader = new LoadSprites();
 
 		map = new Map("Levels/level" + currentNivel + ".png", loader);
