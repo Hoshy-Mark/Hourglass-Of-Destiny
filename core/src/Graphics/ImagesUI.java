@@ -3,8 +3,10 @@ package Graphics;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 
-public class ImagesUI {
+public class ImagesUI extends Actor {
     private Texture image;
     private float x, y; // Posição da imagem
     private float scaleX, scaleY; // Escala da imagem
@@ -22,9 +24,9 @@ public class ImagesUI {
         this.y = y;
     }
 
-    public void render(SpriteBatch batch) {
+    public void render(SpriteBatch batch, Stage stage) {
         if (image != null) {
-            batch.draw(image, x, y, 400, 150);
+            batch.draw(image, x, y, 1080, 650);
         }
     }
 
@@ -33,4 +35,7 @@ public class ImagesUI {
             image.dispose();
         }
     }
+
+
+
 }

@@ -71,17 +71,17 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 		loader = new LoadSprites();
 
-		map = new Map("Levels/level" + currentNivel + ".png", loader);
+		map = new Map("Levels/levelTest.png", loader);
 		levelBuilder = new LevelBuilder(loader);
 		mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 1f, batch);
 
 		createPlayer();
 		createEnemies();
 		createGameItems();
-
-		portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0] * 16, map.getPosition("PortalUp")[1] * 16);
-		portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0] * 16, map.getPosition("PortalDown")[1] * 16);
-
+		if(portalUp != null && portalDown != null) {
+			portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0] * 16, map.getPosition("PortalUp")[1] * 16);
+			portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0] * 16, map.getPosition("PortalDown")[1] * 16);
+		}
 		crossbowGun = null;
 	}
 
@@ -162,8 +162,6 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 		if(portalUp != null && portalDown != null) {
 			if (enemies.isEmpty()) {
-				portalDown.act(delta);
-				portalUp.act(delta);
 				portalUp.draw(batch);
 				portalDown.draw(batch);
 		 	}
@@ -535,9 +533,11 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 			int randomNumber = random.nextInt(2);
 			if(randomNumber == 0){
 				Ring ring2 = new Ring(x, y, 16, 16, new Sprite(loader.getSprite("GreenRing")), "speed");
+				ring2.getSpriteCurrent().setScale(0.6f);
 				rings.add(ring2);
 			}else{
 				Ring ring2 = new Ring(x, y, 16, 16, new Sprite(loader.getSprite("RedRing")), "life");
+				ring2.getSpriteCurrent().setScale(0.6f);
 				rings.add(ring2);
 			}
 		}
