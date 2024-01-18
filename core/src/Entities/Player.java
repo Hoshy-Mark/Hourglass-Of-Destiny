@@ -74,6 +74,7 @@ public class Player extends Entity {
             SpriteCurrent = new Sprite(RightSprites.get(1));
             previousSprite = new Sprite(RightSprites.get(1)); //inicializa o previousSprite com o valor inicial de SpriteCurrent
         }
+
         currentWeapon = "sword";
         updateLifeString();
     }
@@ -96,15 +97,15 @@ public class Player extends Entity {
             currentAnimation = animationRight;
             curAnimation = "right";
             if (sword != null) {
-                sword.setPosition(this.getX() + 2, this.getY() + 3);
                 sword.setOrientation("right");
+                sword.setPosition(this.getX() + 2, this.getY() + 3);
             }
         } else if (mouseX < playerX) {
             currentAnimation = animationLeft;
             curAnimation = "left";
             if (sword != null) {
-                sword.setPosition(this.getX() - 2, this.getY() + 3);
                 sword.setOrientation("left");
+                sword.setPosition(this.getX() - 2, this.getY() + 3);
             }
         }
 
@@ -144,6 +145,9 @@ public class Player extends Entity {
                     if (crossbowGun != null) {
                         crossbowGun.setPosition(this.getX()+4, this.getY()-3);
                     }
+                    if (sword != null && curAnimation == "left"){
+                        sword.setPosition(this.getX() - 2, this.getY() + 3);
+                    }
                     moving = true;
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
@@ -151,6 +155,9 @@ public class Player extends Entity {
                     this.move("right", delta, map);
                     if (crossbowGun != null) {
                         crossbowGun.setPosition(this.getX()+4, this.getY()-3);
+                    }
+                    if (sword != null && curAnimation == "right"){
+                        sword.setPosition(this.getX() + 2, this.getY() + 3);
                     }
                     moving = true;
                 }

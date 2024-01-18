@@ -22,7 +22,7 @@ public class PlayerUI {
 
         // Inicia a fonte e o estilo da label
         font = new BitmapFont();
-        font.getData().setScale(1.5f, 1.5f); // Aumenta o tamanho da fonte
+        font.getData().setScale(3.0f, 3.0f); // Aumenta o tamanho da fonte
         LabelStyle style = new LabelStyle(font, Color.WHITE);
         lifeLabel = new Label(player.getLifeString(), style);
         ammunitionLabel = new Label(player.getAmmunitionString(), style);

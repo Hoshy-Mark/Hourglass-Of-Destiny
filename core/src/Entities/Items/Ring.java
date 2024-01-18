@@ -18,6 +18,8 @@ public class Ring extends Item {
         if(type == "speed"){
             improve = 5;
         }
+
+        setScale(0.5f);
     }
 
     public int getImprove() {

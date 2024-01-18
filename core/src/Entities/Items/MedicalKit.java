@@ -8,6 +8,7 @@ public class MedicalKit extends Item {
     private final int lifeValue = 20;
     public MedicalKit(float x, float y, float width, float height, Array<TextureRegion> sprites) {
         super(x, y, width, height, sprites, 3);
+        setScale(0.8f);
     }
 
     public int getLifeValue(){

@@ -12,5 +12,6 @@ public class Bat extends Enemy {
         setDamage(2);
         setSpeed(20);
         setMaxViewDistance(120);
+        setScale(0.6f);
     }
 }
