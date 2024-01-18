@@ -112,6 +112,9 @@ public class Player extends Entity {
             crossbowGun.setOrientation(direction, curAnimation);
         }
 
+        if(currentWeapon.equals("crossbow")){
+            updateAmmunationString();
+        }
 
         if (playerDamaged){
             if(currentAnimation == animationRight){
@@ -319,7 +322,7 @@ public class Player extends Entity {
                     this.life = 0;
                 }
 
-                updateLifeString();  // Atualiza a vida em formato de String após perda de vida
+                updateLifeString();// Atualiza a vida em formato de String após perda de vida
             }
         }
     }
@@ -329,7 +332,7 @@ public class Player extends Entity {
         this.lifeString = "Life: " + (int) this.life + " / " + (int) maxLife;
     }
 
-    private void updateAmmunationString(){
+    public void updateAmmunationString(){
         this.ammunitionString = "Ammunition: " + (int) this.Ammunition;
     }
 
@@ -347,6 +350,7 @@ public class Player extends Entity {
     }
     public void setLife(double life) {
         this.life = life;
+        this.updateLifeString();
     }
     public String getLifeString() {
         return lifeString;

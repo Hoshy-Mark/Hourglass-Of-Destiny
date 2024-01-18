@@ -35,6 +35,12 @@ public class PlayerUI {
         stage.addActor(ammunitionLabel);
     }
 
+    public void resize(int width, int height) {
+        lifeLabel.setPosition(30, height - lifeLabel.getHeight() - 15);
+        ammunitionLabel.setPosition(30, height - lifeLabel.getHeight() - 35);
+        stage.getViewport().update(width, height, true);
+    }
+
     public void update() {
         // Atualiza a vida na label com a mais recente vida do player
         lifeLabel.setText(player.getLifeString());
