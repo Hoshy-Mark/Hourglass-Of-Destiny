@@ -54,7 +54,7 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	private ArrayList<Chest> chest;
 	private Entities.Blades.Sword sword;
 
-	public static String gameState = "PLAY";
+	public static String gameState = "MENU";
 
 	private ImagesUI imageUI;
 	private GameSettings gameSettings;
@@ -63,8 +63,10 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 	@Override
 	public void create() {
+    
 		Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-		batch = new SpriteBatch();
+		
+    batch = new SpriteBatch();
 		camera = new OrthographicCamera(1920, 1080);
 		viewport = new FitViewport(1920, 1080, camera);
 		gameSettings = new GameSettings(viewport);
@@ -169,8 +171,10 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 		batch.end(); // Finalizar o desenho
 
-		playerUI.update();
-		playerUI.draw();
+		if(gameState == "PLAY"){
+			playerUI.update();
+			playerUI.draw();
+		}
 
 		updateCamera(); // Atualiza a câmera para seguir o 'player'
 	}
