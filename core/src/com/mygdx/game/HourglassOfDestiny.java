@@ -12,6 +12,7 @@ import Graphics.LevelBuilder;
 import Graphics.LoadSprites;
 import Graphics.Map;
 import Graphics.PlayerUI;
+import Settings.ButtonHandler;
 import Settings.GameSettings;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -25,6 +26,8 @@ import com.badlogic.gdx.math.MathUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import Settings.SaveState;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import static com.badlogic.gdx.math.MathUtils.random;
@@ -60,13 +63,37 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 	private GameSettings gameSettings;
 	private FitViewport viewport;
 
+	private ButtonHandler buttonHandler;
+
 
 	@Override
 	public void create() {
     
 		Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-		
-    batch = new SpriteBatch();
+
+		buttonHandler = new ButtonHandler();
+
+		TextButton button1 = buttonHandler.createButton("Botão 1", new ClickListener() {
+			@Override
+			public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+				System.out.println("Botão 1 clicado!");
+				// Lógica específica para o Botão 1
+			}
+		}, 100,100);
+
+
+		imageUI = new ImagesUI("ImagesUi/Menu"); // Substitua pelo nome da sua imagem
+		// Defina a posição da imagem, se necessário
+		imageUI.setPosition(-120, 200);
+
+
+
+		imageUI.toBack();
+
+		button1.toFront();
+
+
+    	batch = new SpriteBatch();
 		camera = new OrthographicCamera(1920, 1080);
 		viewport = new FitViewport(1920, 1080, camera);
 		gameSettings = new GameSettings(viewport);
@@ -85,6 +112,9 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 			portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0] * 16, map.getPosition("PortalDown")[1] * 16);
 		}
 		crossbowGun = null;
+
+
+
 	}
 
 	@Override
@@ -153,12 +183,10 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 
 		else if(gameState == "MENU"){
 
-			imageUI = new ImagesUI("ImagesUi/Menu"); // Substitua pelo nome da sua imagem
-			// Defina a posição da imagem, se necessário
-			imageUI.setPosition(-50, 245);
-
+			buttonHandler.render();
 			// Renderize a imagem usando a classe ImagesUI
-			imageUI.render(batch);
+			imageUI.render(batch, buttonHandler.getStage());
+
 
 		}
 
@@ -191,6 +219,8 @@ public class HourglassOfDestiny extends ApplicationAdapter {
 		batch.dispose();// Limpar os recursos
 		mapRenderer.dispose(); // Disponibiliza os recursos do mapRenderer
 		playerUI.dispose();
+
+		buttonHandler.dispose();
 	}
 
 	public void checkBulletCollision(float delta) {
