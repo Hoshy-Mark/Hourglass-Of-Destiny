@@ -47,15 +47,11 @@ public class LevelBuilder {
             if(opcaoEscolhida == 1) {
                 Array<TextureRegion> enemySprites = loader.getSprites("Slime");
                 Enemy enemy = new Slime(x, y, 16, 16, enemySprites, player);
-                //Define o Dimensão da Sprite
-                enemy.getSpriteCurrent().setScale(0.8f);
                 enemies.add(enemy);
             }
             else{
                 Array<TextureRegion> enemySprites = loader.getSprites("Bat");
                 Enemy enemy = new Bat(x, y, 16, 16, enemySprites, player);
-                //Define o Dimensão da Sprite
-                enemy.getSpriteCurrent().setScale(0.6f);
                 enemies.add(enemy);
             }
         }

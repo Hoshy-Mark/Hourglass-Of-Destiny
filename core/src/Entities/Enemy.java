@@ -25,6 +25,7 @@ public class Enemy extends Entity{
     private int shotsHit = 0;
     private float originalSpeed;
     private String direction;
+    private float scale;
 
     public Enemy(float x, float y, float width, float height, Array<TextureRegion> sprites, Player player) {
         super(x, y, width, height); // chamada ao construtor da superclasse (Entity)
@@ -56,6 +57,7 @@ public class Enemy extends Entity{
 
         // Define a animação atual logo no inicio do objeto
         currentAnimation = animationRight;
+
     }
 
     // Este método é chamado em cada quadro de animação para realizar ações do inimigo
@@ -115,6 +117,8 @@ public class Enemy extends Entity{
         if (isCollidingWithPlayer()) {
             player.setLife(player.getLife() - damage);
         }
+
+        getSpriteCurrent().setScale(scale);
     }
     public void moveRight(float delta) {
         currentAnimation = animationRight;
@@ -193,5 +197,10 @@ public class Enemy extends Entity{
 
     public void setShotsHit(int shotsHit) {
         this.shotsHit = shotsHit;
+    }
+
+    @Override
+    public void setScale(float scale) {
+        this.scale = scale;
     }
 }

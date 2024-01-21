@@ -14,6 +14,7 @@ public class Item extends Entity {
     private float animationDuration = 0.3f; // Define a duração da animação
     private float stateTime = 0; // Variável que mantém o andamento do tempo de animação
     private int frameNumber; // Número de frames na animação.
+    private float scale;
 
 
     // Construtor se a Item tiver várias sprites (uma animação)
@@ -49,10 +50,16 @@ public class Item extends Entity {
     }
     public void draw(Batch batch){
         SpriteCurrent.setPosition(this.getX(), this.getY());
+        SpriteCurrent.setScale(scale);
         SpriteCurrent.draw(batch);
     }
 
     public Sprite getSpriteCurrent() {
         return SpriteCurrent;
+    }
+
+    @Override
+    public void setScale(float scale) {
+        this.scale = scale;
     }
 }

@@ -12,5 +12,6 @@ public class Slime extends Enemy {
         setDamage(1);
         setSpeed(15);
         setMaxViewDistance(100);
+        setScale(0.8f);
     }
 }
