@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -58,6 +59,8 @@ public class PauseScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        resumeButton.setTouchable(Touchable.enabled);
+        menuButton.setTouchable(Touchable.enabled);
     }
 
     @Override
@@ -91,7 +94,10 @@ public class PauseScreen implements Screen {
     public void resume() {}
 
     @Override
-    public void hide() {}
+    public void hide() {
+        resumeButton.setTouchable(Touchable.disabled);
+        menuButton.setTouchable(Touchable.disabled);
+    }
 
     @Override
     public void dispose () {

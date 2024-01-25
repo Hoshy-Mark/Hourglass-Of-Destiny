@@ -59,7 +59,6 @@ public class Entity extends Actor {
     public static boolean isColliding(Rectangle e1, Entity e2){
         return e1.overlaps(e2.hitbox);
     }
-
     @Override
     public void setX(float x) {
         this.x = x;

@@ -47,9 +47,63 @@ public class LoadSprites {
     // Metodo para carregar as imagens
 
     public void loadSprite(String keyName, String filePath){
-        sprites.put(keyName, new Texture(Gdx.files.internal(filePath)));
+        Texture sprite = new Texture(Gdx.files.internal(filePath));
+        sprites.put(keyName, sprite);
     }
     public void loadAllSprites(){
+        loadSprite("ChaoDeLama","Tiles/ChaoDeLama.png");
+        loadSprite("ChaoDePedra","Tiles/ChaoDePedra.png");
+        loadSprite("GramaFofaSombra","Tiles/GramaFofa Sombra.png");
+        loadSprite("GramaFofa1","Tiles/GramaFofa 1.png");
+        loadSprite("GramaFofa2","Tiles/GramaFofa 2.png");
+        loadSprite("GramaFofa3","Tiles/GramaFofa 3.png");
+        loadSprite("GramaFofa4","Tiles/GramaFofa 4.png");
+        loadSprite("GramaFofa5","Tiles/GramaFofa 5.png");
+        loadSprite("GramaMaisRalaSombra","Tiles/GramaMaisRala Sombra.png");
+        loadSprite("GramaMaisRala1","Tiles/GramaMaisRala 1.png");
+        loadSprite("GramaMaisRala2","Tiles/GramaMaisRala 2.png");
+        loadSprite("GramaMaisRala3","Tiles/GramaMaisRala 3.png");
+        loadSprite("GramaMaisRala4","Tiles/GramaMaisRala 4.png");
+        loadSprite("GramaMaisRala5","Tiles/GramaMaisRala 5.png");
+        loadSprite("GramaRala1","Tiles/GramaRala 1.png");
+        loadSprite("GramaRala2","Tiles/GramaRala 2.png");
+        loadSprite("GramaRala3","Tiles/GramaRala 3.png");
+        loadSprite("GramaRala4","Tiles/GramaRala 4.png");
+        loadSprite("GramaRala5","Tiles/GramaRala 5.png");
+        loadSprite("GramaRala6","Tiles/GramaRala 6.png");
+        loadSprite("GramaRala7","Tiles/GramaRala 7.png");
+        loadSprite("GramaRala8","Tiles/GramaRala 8.png");
+
+        loadSprite("Cerca1","Tiles/Cerca 1.png");
+        loadSprite("Cerca2","Tiles/Cerca 2.png");
+        loadSprite("Cerca3","Tiles/Cerca 3.png");
+        loadSprite("Cerca4","Tiles/Cerca 4.png");
+        loadSprite("Cerca5","Tiles/Cerca 5.png");
+        loadSprite("Cerca6","Tiles/Cerca 6.png");
+        loadSprite("Cerca7","Tiles/Cerca 7.png");
+        loadSprite("Cerca8","Tiles/Cerca 8.png");
+        loadSprite("Cerca9","Tiles/Cerca 9.png");
+        loadSprite("Cerca10","Tiles/Cerca 10.png");
+        loadSprite("Cerca11","Tiles/Cerca 11.png");
+
+        loadSprite("CercaFloresta1","Tiles/CercaFloresta 1.png");
+        loadSprite("CercaFloresta2","Tiles/CercaFloresta 2.png");
+        loadSprite("CercaFloresta3","Tiles/CercaFloresta 3.png");
+        loadSprite("CercaFloresta4","Tiles/CercaFloresta 4.png");
+        loadSprite("CercaFloresta5","Tiles/CercaFloresta 5.png");
+        loadSprite("CercaFloresta6","Tiles/CercaFloresta 6.png");
+        loadSprite("CercaFloresta7","Tiles/CercaFloresta 7.png");
+        loadSprite("CercaFloresta8","Tiles/CercaFloresta 8.png");
+        loadSprite("CercaFloresta9","Tiles/CercaFloresta 9.png");
+
+        loadSprite("Pedra","Tiles/pedras.png");
+        loadSprite("Tronco1","Tiles/Tronco 1.png");
+        loadSprite("Tronco2","Tiles/Tronco 2.png");
+        loadSprite("Tronco3","Tiles/Tronco 3.png");
+        loadSprite("Tronco4","Tiles/Tronco 4.png");
+        loadSprite("Cruz","Tiles/cruz.png");
+        loadSprite("Flor","Tiles/flor.png");
+
         loadSprite("Grass1", "Sprites/Grass One.png");
         loadSprite("Grass2", "Sprites/Grass Two.png");
         loadSprite("Grass3", "Sprites/Grass Three.png");

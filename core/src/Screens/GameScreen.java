@@ -1,5 +1,6 @@
 package Screens;
 
+import Audio.AudioManager;
 import Entities.*;
 import Entities.Blades.Sword;
 import Entities.InteractiveObjects.Chest;
@@ -37,7 +38,7 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
     private OrthographicCamera camera;
     private PlayerUI playerUI;
-
+    private AudioManager audioManager = new AudioManager();
     private Player player; // Fazer 'player' uma variável global
     private Crossbow crossbowItem;
     private Entities.Guns.Crossbow crossbowGun;
@@ -69,13 +70,12 @@ public class GameScreen implements Screen {
 
         loader = new LoadSprites();
 
-        map = new Map("Levels/levelTest.png", loader);
+        map = new Map("Levels/level"+ currentNivel+".png", loader);
         levelBuilder = new LevelBuilder(loader);
-        mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 1f, batch);
-        if(portalUp != null && portalDown != null) {
-            portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0] * 16, map.getPosition("PortalUp")[1] * 16);
-            portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0] * 16, map.getPosition("PortalDown")[1] * 16);
-        }
+        mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 0.25f, batch);
+        portalUp = levelBuilder.createPortalUp(map.getPosition("PortalUp")[0] * 16, map.getPosition("PortalUp")[1] * 16);
+        portalDown = levelBuilder.createPortalDown(map.getPosition("PortalDown")[0] * 16, map.getPosition("PortalDown")[1] * 16);
+
         crossbowGun = null;
     }
 
@@ -155,6 +155,9 @@ public class GameScreen implements Screen {
                 portalDown.draw(batch);
             }
         }
+
+        portalUp.act(delta);
+        portalDown.act(delta);
 
         batch.end(); // Finalizar o desenho
 
@@ -314,6 +317,7 @@ public class GameScreen implements Screen {
             if (bullet.isCollidingWithWall(map.getTiles())) {  // Verifique a colisão com a parede
                 // Se a bala colidiu com uma parede, remove-a da lista.
                 bulletIterator.remove();
+                audioManager.playHitWood();
             }
         }
     }
@@ -486,6 +490,7 @@ public class GameScreen implements Screen {
         }
         if (type == "Enemy") {
             Arrow arrow = new Arrow(x, y, 16, 16, new Sprite(loader.getSprite("Arrow")), ammunition);
+            audioManager.playDropArrow();
             arrows.add(arrow);
         }
     }
@@ -512,6 +517,7 @@ public class GameScreen implements Screen {
                     enemy.setShotsHit(enemy.getShotsHit() + 1);
 
                     enemy.setDamaged(true);
+                    audioManager.playHitSound(); // tocar o som de impacto
 
                     // Se a vida do inimigo chegar a 0, removemos ele da lista de inimigos.
                     if (enemy.getLife() <= 0) {
@@ -534,9 +540,10 @@ public class GameScreen implements Screen {
     private void reloadLevel() {
         map = new Map("Levels/level" + currentNivel + ".png", loader);
         // A posição do jogador é atualizada, mas o objeto não é recriado.
+        // A posição do jogador é atualizada, mas o objeto não é recriado.
         player.setPosition(map.getPosition("Player")[0] * 16, map.getPosition("Player")[1] * 16);
         enemies = levelBuilder.createEnemies(map.getEnemiesListed(), player);
-        mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 1f, batch);
+        mapRenderer = new OrthogonalTiledMapRenderer(map.getTiledMap(), 0.25f, batch);
         medicalKits = levelBuilder.createMedicalKits(map.getMedicalKitsListed());
         arrows = levelBuilder.createArrows(map.getArrowsListed());
         if (map.getPosition("Crossbow") != null) {

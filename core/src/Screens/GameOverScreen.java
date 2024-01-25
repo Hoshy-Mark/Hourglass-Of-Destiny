@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -54,8 +55,9 @@ public class GameOverScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        restartButton.setTouchable(Touchable.enabled);  // habilita botão
+        menuButton.setTouchable(Touchable.enabled); // habilita botão
     }
-
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -87,7 +89,10 @@ public class GameOverScreen implements Screen {
     public void resume() {}
 
     @Override
-    public void hide() {}
+    public void hide() {
+        restartButton.setTouchable(Touchable.disabled);  // desabilita botão
+        menuButton.setTouchable(Touchable.disabled); // desabilita botão
+    }
 
     @Override
     public void dispose() {
