@@ -1,5 +1,6 @@
 package Entities;
 
+import Audio.AudioManager;
 import Entities.Blades.Sword;
 import Entities.InteractiveObjects.Chest;
 import Graphics.LoadSprites;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -23,6 +25,7 @@ public class Player extends Entity {
     private Array<TextureRegion> sprites;
     private final float animationDuration = 0.15f;
     private final int tileSize = 16;
+    private AudioManager audioManager = new AudioManager();
     private Array<TextureRegion> RightSprites = new  Array<TextureRegion>();
     private Array<TextureRegion> LeftSprites = new  Array<TextureRegion>();
     private Array<TextureRegion> DamageSprites = new  Array<TextureRegion>();
@@ -213,10 +216,14 @@ public class Player extends Entity {
                 if (sword != null && !sword.isAttacking() && currentWeapon.equals("sword")) { // certifique-se de que a espada está disponível e não está atualmente atacando antes de atacar
                     sword.setOrientation(currentAnimation == animationRight ? "right" : "left");
                     sword.attack();
+                    audioManager.playSwordCutSound(); // tocar o som de corte de espada
+
                 } else if(crossbowGun != null && Ammunition > 0 && this.getShootElapsedTime() >= 0.3f && currentWeapon.equals("crossbow")){
                     bullets.add(this.getCrossbow().shoot());
                     this.setAmmunition(this.getAmmunition() - 1); // diminui a munição do jogador a cada tiro
                     this.setShootElapsedTime(0);  // reset the shootElapsedTime each time you shoot.
+                    audioManager.playShootSound(); // tocar o som de tiro
+
                 }
             }
             if(sword != null){

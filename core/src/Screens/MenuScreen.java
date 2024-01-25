@@ -1,11 +1,13 @@
 package Screens;
 
+import Audio.AudioManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -18,6 +20,7 @@ public class MenuScreen implements Screen {
     private final HourglassOfDestiny game;
     private Stage stage;
     private TextButton startButton, newGameButton, settingsButton;
+    private AudioManager audioManager = new AudioManager();
 
     public MenuScreen(final HourglassOfDestiny game) {
         this.game = game;
@@ -66,8 +69,11 @@ public class MenuScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        audioManager.playBackgroundMusic();
+        startButton.setTouchable(Touchable.enabled);
+        newGameButton.setTouchable(Touchable.enabled);
+        settingsButton.setTouchable(Touchable.enabled);
     }
-
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -105,7 +111,13 @@ public class MenuScreen implements Screen {
     public void resume() {}
 
     @Override
-    public void hide() {}
+    public void hide() {
+        // A tela ficou inativa - parar a música
+        audioManager.stopBackgroundMusic();
+        startButton.setTouchable(Touchable.disabled);
+        newGameButton.setTouchable(Touchable.disabled);
+        settingsButton.setTouchable(Touchable.disabled);
+    }
 
     @Override
     public void dispose () {

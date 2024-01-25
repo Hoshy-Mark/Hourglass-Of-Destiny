@@ -52,10 +52,10 @@ public class Crossbow extends Gun {
     }
 
     public void spritesBullet(){
-        sprites.put("up",loader.getSprites("Arrows").get(4));
-        sprites.put("down",loader.getSprites("Arrows").get(5));
-        sprites.put("left",loader.getSprites("Arrows").get(6));
-        sprites.put("right",loader.getSprites("Arrows").get(7));
+        sprites.put("down",loader.getSprites("Arrows").get(4));
+        sprites.put("up",loader.getSprites("Arrows").get(5));
+        sprites.put("right",loader.getSprites("Arrows").get(6));
+        sprites.put("left",loader.getSprites("Arrows").get(7));
         sprites.put("up-right",loader.getSprites("Arrows").get(1));
         sprites.put("down-right",loader.getSprites("Arrows").get(3));
         sprites.put("up-left",loader.getSprites("Arrows").get(0));
